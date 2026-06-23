@@ -231,7 +231,7 @@ MadoDicomKosDocumentReference,relatesTo.extension,
 MadoDicomKosDocumentReference,relatesTo.modifierExtension,
 MadoDicomKosDocumentReference,relatesTo.code,
 MadoDicomKosDocumentReference,relatesTo.target,
-MadoDicomKosDocumentReference,relatesTo[fhirReference],MS
+MadoDicomKosDocumentReference,relatesTo[fhir-reference],MS
 MadoDicomKosDocumentReference,description,
 MadoDicomKosDocumentReference,securityLabel,MS
 MadoDicomKosDocumentReference,content,
@@ -377,7 +377,7 @@ MadoFhirDocumentReference,relatesTo.extension,
 MadoFhirDocumentReference,relatesTo.modifierExtension,
 MadoFhirDocumentReference,relatesTo.code,
 MadoFhirDocumentReference,relatesTo.target,
-MadoFhirDocumentReference,relatesTo[kosReference],MS
+MadoFhirDocumentReference,relatesTo[kos-reference],MS
 MadoFhirDocumentReference,description,
 MadoFhirDocumentReference,securityLabel,MS
 MadoFhirDocumentReference,content,
@@ -493,7 +493,7 @@ MadoImagingStudy,series.instance,
 MadoImagingStudy,series.instance.id,
 MadoImagingStudy,series.instance.extension,
 MadoImagingStudy,series.instance.extension[number-of-frames],MS
-MadoImagingStudy,series.instance.extension[koDocumentTitle],MS
+MadoImagingStudy,series.instance.extension[ko-document-title],MS
 MadoImagingStudy,series.instance.modifierExtension,
 MadoImagingStudy,series.instance.uid,MS
 MadoImagingStudy,series.instance.sopClass,MS
@@ -572,7 +572,7 @@ MadoRequestedProcedure,contained,
 MadoRequestedProcedure,extension,
 MadoRequestedProcedure,modifierExtension,
 MadoRequestedProcedure,identifier,
-MadoRequestedProcedure,identifier[accessionNumber],MS
+MadoRequestedProcedure,identifier[accession-number],MS
 MadoRequestedProcedure,identifier[placer],MS
 MadoRequestedProcedure,identifier.id,
 MadoRequestedProcedure,identifier.extension,
@@ -652,7 +652,7 @@ MadoWadoEndpoint,language,
 MadoWadoEndpoint,text,
 MadoWadoEndpoint,contained,
 MadoWadoEndpoint,extension,
-MadoWadoEndpoint,extension[retrieveLocationUid],MS
+MadoWadoEndpoint,extension[retrieve-location-uid],MS
 MadoWadoEndpoint,modifierExtension,
 MadoWadoEndpoint,identifier,
 MadoWadoEndpoint,status,
@@ -686,7 +686,7 @@ MadoWadoEndpoint,payloadMimeType,
 MadoWadoEndpoint,address,MS
 MadoWadoEndpoint,address.id,
 MadoWadoEndpoint,address.extension,
-MadoWadoEndpoint,address.extension[dataAbsentReason],
+MadoWadoEndpoint,address.extension[data-absent-reason],
 MadoWadoEndpoint,address.extension.id,
 MadoWadoEndpoint,address.extension.extension,
 MadoWadoEndpoint,address.extension.url,
@@ -722,5 +722,5 @@ MadoWebViewerEndpoint,payloadType.coding.display,
 MadoWebViewerEndpoint,payloadType.coding.userSelected,
 MadoWebViewerEndpoint,payloadType.text,
 MadoWebViewerEndpoint,payloadMimeType,
-MadoWebViewerEndpoint,address,
+MadoWebViewerEndpoint,address,MS
 MadoWebViewerEndpoint,header,

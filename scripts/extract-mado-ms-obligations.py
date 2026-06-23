@@ -13,7 +13,9 @@ import sys
 from collections import OrderedDict
 
 # Configuration
-IHE_DIR = os.path.expanduser('~/.fhir/packages/ihe.rad.mado#current/package')
+SUSHI_CONFIG = 'imaging-manifest-fork/sushi-config.yaml'
+IHE_PACKAGE_ID = 'ihe.rad.mado'
+IHE_PACKAGE_DEFAULT_VERSION = 'current'
 XTE_DIR = os.path.expanduser('~/.fhir/packages/xtehr.eu.ehds.models#1.0.0/package')
 OUT_DIR = 'imaging-manifest-fork/output'
 OUT_CSV_IHE = 'ai-result/step1-ihe-mado-fields.csv'
@@ -35,6 +37,43 @@ EU_CONSUMER = 'http://hl7.eu/fhir/imaging-manifest/ActorDefinition/EuMadoImaging
 EU_PRODUCER = 'http://hl7.eu/fhir/imaging-manifest/ActorDefinition/EuMadoImagingManifestProducer'
 
 EHDS_REF_PATTERN = r'\bEHDS[A-Za-z0-9]+(?:\.[A-Za-z0-9\[\]x-]+)+\b'
+
+
+def resolve_ihe_dir_from_sushi_config():
+    """Resolve ihe.rad.mado package directory using sushi-config dependency version."""
+    version = IHE_PACKAGE_DEFAULT_VERSION
+
+    try:
+        with open(SUSHI_CONFIG, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Match typical inline form under dependencies:
+        # ihe.rad.mado: dev
+        dep_match = re.search(
+            r'(?ms)^dependencies:\s*$.*?^\s*' + re.escape(IHE_PACKAGE_ID) + r'\s*:\s*([^\n#]+)',
+            content,
+        )
+        if dep_match:
+            value = dep_match.group(1).strip().strip('"\'')
+            # Ignore object-mapping starts and fall back if unresolved.
+            if value and value not in {'|', '>', '{'}:
+                version = value
+    except Exception as e:
+        print(
+            f'Warning: Could not parse {SUSHI_CONFIG} for {IHE_PACKAGE_ID}: {e}. Using {IHE_PACKAGE_DEFAULT_VERSION}.',
+            file=sys.stderr,
+        )
+
+    ihe_dir = os.path.expanduser(f'~/.fhir/packages/{IHE_PACKAGE_ID}#{version}/package')
+    if not os.path.isdir(ihe_dir):
+        fallback = os.path.expanduser(f'~/.fhir/packages/{IHE_PACKAGE_ID}#{IHE_PACKAGE_DEFAULT_VERSION}/package')
+        print(
+            f'Warning: Resolved IHE package path not found: {ihe_dir}. Falling back to {fallback}.',
+            file=sys.stderr,
+        )
+        ihe_dir = fallback
+
+    return ihe_dir
 
 
 def deduplicate_rows(rows):
@@ -112,13 +151,64 @@ def extract_ehds_references(text, ehds_lookup):
     return ' | '.join(refs)
 
 
+def _normalize_ihe_key_for_match(key):
+    """Normalize IHE cross-reference key for tolerant matching.
+
+    Keeps the profile/path structure but normalizes bracketed slice names by
+    removing dashes/underscores and lowercasing (e.g. retrieve-location-uid
+    and retrieveLocationUid become equivalent).
+    """
+    if not key:
+        return ''
+
+    def repl(match):
+        raw = match.group(1)
+        normalized = re.sub(r'[-_\s]', '', raw).lower()
+        return f'[{normalized}]'
+
+    return re.sub(r'\[([^\]]+)\]', repl, key.strip())
+
+
+def _slice_names(key):
+    """Extract ordered slice names from a cross-reference key."""
+    if not key:
+        return []
+    return re.findall(r'\[([^\]]+)\]', key)
+
+
+def _is_camel_vs_kebab_slice_mismatch(left_key, right_key):
+    """True when keys are normalization-equivalent but differ by camelCase vs kebab-case slice names."""
+    if not left_key or not right_key:
+        return False
+    if _normalize_ihe_key_for_match(left_key) != _normalize_ihe_key_for_match(right_key):
+        return False
+
+    left_slices = _slice_names(left_key)
+    right_slices = _slice_names(right_key)
+    if len(left_slices) != len(right_slices):
+        return False
+
+    for l_slice, r_slice in zip(left_slices, right_slices):
+        l_has_kebab = '-' in l_slice
+        r_has_kebab = '-' in r_slice
+        l_has_camel = bool(re.search(r'[A-Z]', l_slice))
+        r_has_camel = bool(re.search(r'[A-Z]', r_slice))
+
+        if (l_has_kebab and r_has_camel) or (r_has_kebab and l_has_camel):
+            return True
+
+    return False
+
+
 def main():
     """Main extraction workflow for the sequential four-step CSV extraction."""
+    ihe_dir = resolve_ihe_dir_from_sushi_config()
+    print(f'Using IHE package directory: {ihe_dir}')
     
     # ===== STEP 1: Load all IHE-MADO profiles =====
     ihe_profiles_by_url = {}
     ihe_profiles_by_name = {}
-    for p in sorted(glob.glob(os.path.join(IHE_DIR, 'StructureDefinition-*.json'))):
+    for p in sorted(glob.glob(os.path.join(ihe_dir, 'StructureDefinition-*.json'))):
         try:
             with open(p, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -344,6 +434,10 @@ def main():
         for row in reader:
             key = f"{row['Profile']}.{row['Field']}"
             ihe_by_key[key] = row
+    ihe_norm_to_keys = {}
+    for key in ihe_by_key:
+        norm = _normalize_ihe_key_for_match(key)
+        ihe_norm_to_keys.setdefault(norm, []).append(key)
     
     # Load EU-MADO fields
     eu_rows_from_file = []
@@ -384,6 +478,17 @@ def main():
                 ('Documentation', eu_documentation),
             ]))
         else:
+            # Warn on likely root-cause mismatch: kebab-case vs camelCase slice naming.
+            if ihe_cross_ref:
+                norm = _normalize_ihe_key_for_match(ihe_cross_ref)
+                for candidate in ihe_norm_to_keys.get(norm, []):
+                    if _is_camel_vs_kebab_slice_mismatch(ihe_cross_ref, candidate):
+                        print(
+                            f"WARNING Step4 slice-name mismatch (camelCase vs kebab-case): "
+                            f"EU IHE-MADO cross-ref '{ihe_cross_ref}' vs IHE key '{candidate}'.",
+                            file=sys.stderr,
+                        )
+                        break
             # EU row with no matching IHE base
             merged_rows.append(OrderedDict([
                 ('IHE-MADO', ''),
@@ -587,7 +692,7 @@ def main():
                         # Store in lookups for Step 8: map IHE-MADO to FHIR and DICOM values
                         mapping_fhir[ihe_mado_profile] = fhir_col
                         mapping_dicom[ihe_mado_profile] = dicom_col
-                        mapping_entries.append((fhir_col, dicom_col))
+                        mapping_entries.append((fhir_col, ihe_mado_profile, dicom_col))
                         
                         # Add to Step 7 with only mapping.csv 4 columns
                         step7_rows.append(OrderedDict([
@@ -616,6 +721,12 @@ def main():
     step8_rows = []
     step8_ihe_keys = set()
 
+    # Build normalized key index only for mismatch diagnostics (strict matching is preserved).
+    mapping_norm_to_keys = {}
+    for key in mapping_fhir:
+        norm = _normalize_ihe_key_for_match(key)
+        mapping_norm_to_keys.setdefault(norm, []).append(key)
+
     # First, merge Step 6 rows with mapping lookups
     with open(OUT_CSV_STEP6, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
@@ -628,6 +739,16 @@ def main():
                 fhir_imaging_manifest = mapping_fhir[ihe_mado]
                 dicom_kos = mapping_dicom.get(ihe_mado, '')
                 step8_ihe_keys.add(ihe_mado)
+            elif ihe_mado:
+                norm = _normalize_ihe_key_for_match(ihe_mado)
+                for candidate in mapping_norm_to_keys.get(norm, []):
+                    if _is_camel_vs_kebab_slice_mismatch(ihe_mado, candidate):
+                        print(
+                            f"WARNING Step8 slice-name mismatch (camelCase vs kebab-case): "
+                            f"Step6 IHE-MADO '{ihe_mado}' vs mapping IHE-MADO '{candidate}'.",
+                            file=sys.stderr,
+                        )
+                        break
             
             step8_rows.append(OrderedDict([
                 ('IHE-MADO', row.get('IHE-MADO', '')),
@@ -644,8 +765,8 @@ def main():
             ]))
 
     # Append mapping.csv rows that did not match any Step 6 IHE-MADO entry
-    for fhir_col, dicom_col in mapping_entries:
-        if fhir_col in step8_ihe_keys:
+    for fhir_col, ihe_mado_profile, dicom_col in mapping_entries:
+        if ihe_mado_profile in step8_ihe_keys:
             continue
         step8_rows.append(OrderedDict([
             ('IHE-MADO', ''),

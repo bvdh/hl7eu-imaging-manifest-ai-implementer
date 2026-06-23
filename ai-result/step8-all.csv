@@ -3,9 +3,9 @@ MadoFhirBundle.id,,EuMadoBundle.id,,,,,,,,
 MadoFhirBundle.meta,,EuMadoBundle.meta,,,,,,,,
 MadoFhirBundle.implicitRules,,EuMadoBundle.implicitRules,,,,,,,,
 MadoFhirBundle.language,,EuMadoBundle.language,,,,,,,,
-MadoFhirBundle.identifier,,EuMadoBundle.identifier,MS,,SHALL:populate,Required by MADO,,,,
+MadoFhirBundle.identifier,MadoFhirBundle.identifier,EuMadoBundle.identifier,MS,,SHALL:populate,Required by MADO,,,,SOP Instance UID (0008
 MadoFhirBundle.type,,EuMadoBundle.type,,,,,,,,
-MadoFhirBundle.timestamp,,EuMadoBundle.timestamp,MS,,SHALL:populate,Required by MADO,,,,
+MadoFhirBundle.timestamp,MadoFhirBundle.timestamp,EuMadoBundle.timestamp,MS,,SHALL:populate,Required by MADO,,,,"Instance Creation Date (0008,0012), Instance Creation Time (0008,0013)"
 MadoFhirBundle.total,,EuMadoBundle.total,,,,,,,,
 MadoFhirBundle.link,,EuMadoBundle.link,,,,,,,,
 MadoFhirBundle.link.id,,EuMadoBundle.link.id,,,,,,,,
@@ -141,7 +141,7 @@ MadoCreator.udiCarrier.entryType,,EuMadoCreator.udiCarrier.entryType,,,,,,,,
 MadoCreator.status,,EuMadoCreator.status,,,,,,,,
 MadoCreator.statusReason,,EuMadoCreator.statusReason,,,,,,,,
 MadoCreator.distinctIdentifier,,EuMadoCreator.distinctIdentifier,,,,,,,,
-MadoCreator.manufacturer,,EuMadoCreator.manufacturer,MS,,SHALL:able-to-populate,Required by MADO,,,,
+MadoCreator.manufacturer,MadoComposition.author[source-device] -> MadoCreator.manufacturer,EuMadoCreator.manufacturer,MS,,SHALL:able-to-populate,Required by MADO,,,,"Manufacturer (0008,0070)"
 MadoCreator.manufactureDate,,EuMadoCreator.manufactureDate,,,,,,,,
 MadoCreator.expirationDate,,EuMadoCreator.expirationDate,,,,,,,,
 MadoCreator.lotNumber,,EuMadoCreator.lotNumber,,,,,,,,
@@ -268,7 +268,7 @@ MadoDicomKosDocumentReference.relatesTo.extension,,EuMadoDicomKosDocumentReferen
 MadoDicomKosDocumentReference.relatesTo.modifierExtension,,EuMadoDicomKosDocumentReference.relatesTo.modifierExtension,,,,,,,,
 MadoDicomKosDocumentReference.relatesTo.code,,EuMadoDicomKosDocumentReference.relatesTo.code,,,,,,,,
 MadoDicomKosDocumentReference.relatesTo.target,,EuMadoDicomKosDocumentReference.relatesTo.target,,,,,,,,
-,,EuMadoDicomKosDocumentReference.relatesTo[fhir-reference],MS,,,,,,,
+MadoDicomKosDocumentReference.relatesTo[fhir-reference],,EuMadoDicomKosDocumentReference.relatesTo[fhir-reference],MS,,,,,,,
 MadoDicomKosDocumentReference.description,,EuMadoDicomKosDocumentReference.description,,,,,,,,
 MadoDicomKosDocumentReference.securityLabel,,EuMadoDicomKosDocumentReference.securityLabel,MS,,,,,,,
 MadoDicomKosDocumentReference.content,,EuMadoDicomKosDocumentReference.content,,,,,,,,
@@ -359,7 +359,7 @@ MadoFhirDocumentReference.relatesTo.extension,,EuMadoFhirDocumentReference.relat
 MadoFhirDocumentReference.relatesTo.modifierExtension,,EuMadoFhirDocumentReference.relatesTo.modifierExtension,,,,,,,,
 MadoFhirDocumentReference.relatesTo.code,,EuMadoFhirDocumentReference.relatesTo.code,,,,,,,,
 MadoFhirDocumentReference.relatesTo.target,,EuMadoFhirDocumentReference.relatesTo.target,,,,,,,,
-,,EuMadoFhirDocumentReference.relatesTo[kos-reference],MS,,,,,,,
+MadoFhirDocumentReference.relatesTo[kos-reference],,EuMadoFhirDocumentReference.relatesTo[kos-reference],MS,,,,,,,
 MadoFhirDocumentReference.description,,EuMadoFhirDocumentReference.description,,,,,,,,
 MadoFhirDocumentReference.securityLabel,,EuMadoFhirDocumentReference.securityLabel,MS,,,,,,,
 MadoFhirDocumentReference.content,,EuMadoFhirDocumentReference.content,,,,,,,,
@@ -433,13 +433,13 @@ MadoImagingStudy.extension[anatomical-region],MadoImagingStudy.extension[anatomi
 ,,EuMadoImagingStudy.extension.value[x],,,,,,,,
 MadoImagingStudy.modifierExtension,,EuMadoImagingStudy.modifierExtension,,,,,,,,
 MadoImagingStudy.identifier,,EuMadoImagingStudy.identifier,,,,,,,,
-MadoImagingStudy.identifier[study-instance-uid],MadoImagingStudy.identifier[study-instance-uid],EuMadoImagingStudy.identifier[study-instance-uid],MS,,SHALL:populate,Required by MADO,,,,"StudyInstanceUID (0020,000D)
+MadoImagingStudy.identifier[study-instance-uid],MadoImagingStudy.identifier[study-instance-uid],EuMadoImagingStudy.identifier[study-instance-uid],MS,,SHALL:populate,Required by MADO,,,,"Study Instance UID (0020,000D)
 Referenced Request Macro (0040.A370) -> Study Instance UID (0020,000D)"
 MadoImagingStudy.status,,EuMadoImagingStudy.status,,,,,,,,
 MadoImagingStudy.modality,MadoImagingStudy.modality,EuMadoImagingStudy.modality,MS,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.modality,EHDSImagingStudy.modality,SHOULD:process,SHALL:able-to-populate,"SR: EV(111028,DCM,""Image Library"") -> EV(121139, DCM, ""Modality"")"
 MadoImagingStudy.subject,,EuMadoImagingStudy.subject,MS,SHOULD:process,SHOULD:able-to-populate,EHDSImagingStudy.subject,,,,
 MadoImagingStudy.encounter,,EuMadoImagingStudy.encounter,,,,,,,,
-MadoImagingStudy.started,MadoImagingStudy.started,EuMadoImagingStudy.started,MS,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.started,EHDSImagingStudy.started,SHOULD:process,SHALL:able-to-populate,"StudyDate (0008,0020) & StudyTime (008,0030)
+MadoImagingStudy.started,MadoImagingStudy.started,EuMadoImagingStudy.started,MS,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.started,EHDSImagingStudy.started,SHOULD:process,SHALL:able-to-populate,"Study Date (0008,0020) & Study Time (008,0030)
 SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"") -> EV(111060,DCM,""Study Date"") & EV (111060,DCM,""Study Time"")"
 MadoImagingStudy.basedOn,,EuMadoImagingStudy.basedOn,,,,,,,,
 MadoImagingStudy.basedOn[order],,EuMadoImagingStudy.basedOn[order],MS,SHOULD:process,SHOULD:able-to-populate,EHDSImagingStudy.basedOn,EHDSImagingStudy.basedOn,SHOULD:process,SHOULD:able-to-populate,
@@ -455,7 +455,7 @@ MadoImagingStudy.location,,EuMadoImagingStudy.location,,,,,,,,
 MadoImagingStudy.reasonCode,,EuMadoImagingStudy.reasonCode,,,,,,,,
 MadoImagingStudy.reasonReference,,EuMadoImagingStudy.reasonReference,,,,,,,,
 MadoImagingStudy.note,,EuMadoImagingStudy.note,,,,,,,,
-MadoImagingStudy.description,MadoImagingStudy.description,EuMadoImagingStudy.description,MS,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.description,EHDSImagingStudy.description,SHOULD:process,SHALL:able-to-populate,"StudyDescription (0008,1030)"
+MadoImagingStudy.description,MadoImagingStudy.description,EuMadoImagingStudy.description,MS,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.description,EHDSImagingStudy.description,SHOULD:process,SHALL:able-to-populate,"Study Description (0008,1030)"
 MadoImagingStudy.series,MadoImagingStudy.series,EuMadoImagingStudy.series,MS,SHOULD:process,SHALL:populate,EHDSImagingStudy.series,EHDSImagingStudy.series,SHOULD:process,SHALL:able-to-populate,"SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"")"
 MadoImagingStudy.series.id,,EuMadoImagingStudy.series.id,,,,,,,,
 MadoImagingStudy.series.extension,,EuMadoImagingStudy.series.extension,,,,,,,,
@@ -481,7 +481,7 @@ MadoImagingStudy.series.instance,,EuMadoImagingStudy.series.instance,,,,,,,,
 MadoImagingStudy.series.instance.id,,EuMadoImagingStudy.series.instance.id,,,,,,,,
 MadoImagingStudy.series.instance.extension,,EuMadoImagingStudy.series.instance.extension,,,,,,,,
 MadoImagingStudy.series.instance.extension[number-of-frames],MadoImagingStudy.series.instance.extension[number-of-frames],EuMadoImagingStudy.series.instance.extension[number-of-frames],MS,,SHALL:able-to-populate,Required by MADO,,,,"SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"") -> Image Library Entry (IMAGE) -> EV (121140, DCM, ""Number of Frames"")"
-,,EuMadoImagingStudy.series.instance.extension[ko-document-title],MS,,SHALL:able-to-populate,Required by MADO,,,,
+MadoImagingStudy.series.instance.extension[ko-document-title],MadoImagingStudy.series.instance.extension[ko-document-title],EuMadoImagingStudy.series.instance.extension[ko-document-title],MS,,SHALL:able-to-populate,Required by MADO,,,,"SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"") -> Image Library Entry (COMPOSITE) EV (121144, DCM, ""Document Title"")"
 MadoImagingStudy.series.instance.modifierExtension,,EuMadoImagingStudy.series.instance.modifierExtension,,,,,,,,
 MadoImagingStudy.series.instance.uid,MadoImagingStudy.series.instance.uid,EuMadoImagingStudy.series.instance.uid,MS,,SHALL:populate,Required by MADO,,,,"SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"") -> Image Library Entry (IMAGE or COMPOSITE) -> Referenced SOP Sequence (0008,1199) -> Referenced SOP Instance UID (0008,1150)"
 MadoImagingStudy.series.instance.sopClass,MadoImagingStudy.series.instance.sopClass,EuMadoImagingStudy.series.instance.sopClass,MS,,SHALL:able-to-populate,Required by MADO,,,,"SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"") -> Image Library Entry (IMAGE or COMPOSITE) -> Referenced SOP Sequence (0008,1199) -> Referenced SOP Class UID (0008,1155)"
@@ -549,7 +549,8 @@ MadoRequestedProcedure.contained,,EuMadoRequestedProcedure.contained,,,,,,,,
 MadoRequestedProcedure.extension,,EuMadoRequestedProcedure.extension,,,,,,,,
 MadoRequestedProcedure.modifierExtension,,EuMadoRequestedProcedure.modifierExtension,,,,,,,,
 MadoRequestedProcedure.identifier,,EuMadoRequestedProcedure.identifier,,,,,,,,
-,,EuMadoRequestedProcedure.identifier[accession-number],MS,,SHALL:populate,Required by MADO,,,,
+MadoRequestedProcedure.identifier[accession-number],"MadoImagingStudy.basedOn[order].identifier
+basedOn[order]->MadoRequestedProcedure.identifier[accession-number]",EuMadoRequestedProcedure.identifier[accession-number],MS,,SHALL:populate,Required by MADO,,,,"Accession Number (0008,0050) & Issuer of Accession Number Sequence (0008,0051)"
 MadoRequestedProcedure.identifier[placer],MadoImagingStudy.basedOn[order]->MadoRequestedProcedure.identifier[placer],EuMadoRequestedProcedure.identifier[placer],MS,,SHALL:able-to-populate,Required by MADO,,,,"Referenced Request Sequence (0040,A370) -> Order Placer Identifier Sequence (0040,0026)"
 MadoRequestedProcedure.identifier.id,,EuMadoRequestedProcedure.identifier.id,,,,,,,,
 MadoRequestedProcedure.identifier.extension,,EuMadoRequestedProcedure.identifier.extension,,,,,,,,
@@ -612,7 +613,7 @@ MadoWadoEndpoint.language,,EuMadoWadoEndpoint.language,,,,,,,,
 MadoWadoEndpoint.text,,EuMadoWadoEndpoint.text,,,,,,,,
 MadoWadoEndpoint.contained,,EuMadoWadoEndpoint.contained,,,,,,,,
 MadoWadoEndpoint.extension,,EuMadoWadoEndpoint.extension,,,,,,,,
-,,EuMadoWadoEndpoint.extension[retrieve-location-uid],MS,,SHALL:able-to-populate,Required by MADO,,,,
+MadoWadoEndpoint.extension[retrieve-location-uid],MadoImagingStudy.series.endpoint -> MadoWadoEndpoint.extension[retrieve-location-uid],EuMadoWadoEndpoint.extension[retrieve-location-uid],MS,,SHALL:able-to-populate,Required by MADO,,,,"CurrentRequestedProcedureEvidenceSequence (0040,8375) -> ReferencedSeriesSequence (0008,1115) -> Retrieve Location Uid (0040,E011)"
 MadoWadoEndpoint.modifierExtension,,EuMadoWadoEndpoint.modifierExtension,,,,,,,,
 MadoWadoEndpoint.identifier,,EuMadoWadoEndpoint.identifier,,,,,,,,
 MadoWadoEndpoint.status,,EuMadoWadoEndpoint.status,,,,,,,,
@@ -643,10 +644,10 @@ MadoWadoEndpoint.payloadType.coding.display,,EuMadoWadoEndpoint.payloadType.codi
 MadoWadoEndpoint.payloadType.coding.userSelected,,EuMadoWadoEndpoint.payloadType.coding.userSelected,,,,,,,,
 MadoWadoEndpoint.payloadType.text,,EuMadoWadoEndpoint.payloadType.text,,,,,,,,
 MadoWadoEndpoint.payloadMimeType,,EuMadoWadoEndpoint.payloadMimeType,,,,,,,,
-MadoWadoEndpoint.address,MadoImagingStudy.series.endpoint -> MadoWadoEndpoint.address,EuMadoWadoEndpoint.address,MS,,SHALL:able-to-populate,Required by MADO,,,,"CurrentRequestedProcedureEvidenceSequence (0040,8375) -> ReferencedSeriesSequence (0008,1115) -> RetrieveUrl (0008,1190)"
+MadoWadoEndpoint.address,MadoImagingStudy.series.endpoint -> MadoWadoEndpoint.address,EuMadoWadoEndpoint.address,MS,,SHALL:able-to-populate,Required by MADO,,,,"CurrentRequestedProcedureEvidenceSequence (0040,8375) -> ReferencedSeriesSequence (0008,1115) -> Retrieve Url (0008,1190)"
 MadoWadoEndpoint.address.id,,EuMadoWadoEndpoint.address.id,,,,,,,,
 MadoWadoEndpoint.address.extension,,EuMadoWadoEndpoint.address.extension,,,,,,,,
-,,EuMadoWadoEndpoint.address.extension[data-absent-reason],,,,,,,,
+MadoWadoEndpoint.address.extension[data-absent-reason],,EuMadoWadoEndpoint.address.extension[data-absent-reason],,,,,,,,
 MadoWadoEndpoint.address.extension.id,,EuMadoWadoEndpoint.address.extension.id,,,,,,,,
 MadoWadoEndpoint.address.extension.extension,,EuMadoWadoEndpoint.address.extension.extension,,,,,,,,
 MadoWadoEndpoint.address.extension.url,,EuMadoWadoEndpoint.address.extension.url,,,,,,,,
@@ -702,9 +703,6 @@ MadoAnatomicalRegionExtension.id,,,,,,,,,,
 MadoAnatomicalRegionExtension.extension,,,,,,,,,,
 MadoAnatomicalRegionExtension.url,,,,,,,,,,
 MadoAnatomicalRegionExtension.value[x],,,,,,,,,,
-MadoDicomKosDocumentReference.relatesTo[fhirReference],,,MS,,,,,,,
-MadoFhirDocumentReference.relatesTo[kosReference],,,MS,,,,,,,
-MadoImagingStudy.series.instance.extension[koDocumentTitle],,,MS,,,,,,,
 MadoKeyObjectDocumentTitle.id,,,,,,,,,,
 MadoKeyObjectDocumentTitle.extension,,,,,,,,,,
 MadoKeyObjectDocumentTitle.url,,,,,,,,,,
@@ -725,7 +723,6 @@ MadoReferencedStudyInstanceUidIdentifier.reference,,,,,,,,,,
 MadoReferencedStudyInstanceUidIdentifier.type,,,,,,,,,,
 MadoReferencedStudyInstanceUidIdentifier.identifier,,,,,,,,,,
 MadoReferencedStudyInstanceUidIdentifier.display,,,,,,,,,,
-MadoRequestedProcedure.identifier[accessionNumber],,,MS,,,,,,,
 MadoRetrieveLocationUIDExtension.id,,,,,,,,,,
 MadoRetrieveLocationUIDExtension.extension,,,,,,,,,,
 MadoRetrieveLocationUIDExtension.url,,,,,,,,,,
@@ -743,8 +740,6 @@ MadoStudyInstanceUidIdentifier.system,,,,,,,,,,
 MadoStudyInstanceUidIdentifier.value,,,,,,,,,,
 MadoStudyInstanceUidIdentifier.period,,,,,,,,,,
 MadoStudyInstanceUidIdentifier.assigner,,,,,,,,,,
-MadoWadoEndpoint.extension[retrieveLocationUid],,,MS,,,,,,,
-MadoWadoEndpoint.address.extension[dataAbsentReason],,,,,,,,,,
 ,,,,,,,EHDSAddress.use,,,
 ,,,,,,,EHDSAddress.type,,,
 ,,,,,,,EHDSAddress.text,,,
@@ -1614,17 +1609,3 @@ MadoWadoEndpoint.address.extension[dataAbsentReason],,,,,,,,,,
 ,,,,,,,EHDSTravelHistory.header.language,,,
 ,,,,,,,EHDSTravelHistory.country,,,
 ,,,,,,,EHDSTravelHistory.period,,,
-,MadoImagingStudy.endpoint -> MadoWebViewerEndpoint.address,,,,,,,,,"CurrentRequestedProcedureEvidenceSequence (0040,8375) -> DisplayURI (0040,E012)"
-,MadoImagingStudy.series.endpoint -> MadoWadoEndpoint.address,,,,,,,,,"CurrentRequestedProcedureEvidenceSequence (0040,8375) -> ReferencedSeriesSequence (0008,1115) -> RetrieveUrl (0008,1190)"
-,MadoImagingStudy.series.endpoint -> MadoWadoEndpoint.extension[retrieve-location-uid],,,,,,,,,"CurrentRequestedProcedureEvidenceSequence (0040,8375) -> ReferencedSeriesSequence (0008,1115) -> RetrieveLocationUid (0040,E011)"
-,MadoImagingStudy.series.instance.extension[ko-document-title],,,,,,,,,"SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"") -> Image Library Entry (COMPOSITE) EV (121144, DCM, ""Document Title"")"
-,MadoImagingStudy.subject->MadoPatient.name,,,,,,,,,"Patient Name (0010,0010)"
-,MadoImagingStudy.subject->MadoPatient.identifier,,,,,,,,,"Patient ID (0010,0020) & Type of Patient ID (0010,0022) & Issuer of Patient ID Qualifiers Sequence (0010,0026)"
-,MadoImagingStudy.subject->MadoPatient.birthDate,,,,,,,,,"Patient Birth Date (0010,0030)"
-,MadoImagingStudy.subject->MadoPatient.gender,,,,,,,,,"Patient Sex (0010,0040)"
-,"MadoImagingStudy.basedOn[order].identifier
-basedOn[order]->MadoRequestedProcedure.identifier[accession-number]",,,,,,,,,"AccessionNumber (0008,0050) & Issuer of Accession Number Sequence (0008,0051)"
-,MadoImagingStudy.basedOn[order]->MadoRequestedProcedure.identifier[placer],,,,,,,,,"Referenced Request Sequence (0040,A370) -> Order Placer Identifier Sequence (0040,0026)"
-,MadoComposition.author[source-device] -> MadoCreator,,,,,,,,,"Manufacturer (0008,0070)"
-,MadoComposition.author[source-organization] -> MadoCreatorOrganization.name,,,,,,,,,"Institution Name (0008,0080) (V2 XON encoding)"
-,MadoComposition.author[source-organization] -> MadoCreatorOrganization.identifier,,,,,,,,,"Institution Name (0008,0080) (V2 XON encoding)"

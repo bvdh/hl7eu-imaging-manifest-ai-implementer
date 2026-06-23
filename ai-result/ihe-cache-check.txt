@@ -1,0 +1,31 @@
+timestamp_current=2026-06-19 17:14:38.207475457 +0200
+timestamp_dev=2026-06-23 13:12:47.689597099 +0200
+
+[current]
+sample_files:
+/home/nly98977/.fhir/packages/ihe.rad.mado#current/package/StructureDefinition-MadoAccessionNumberIdentifier.json
+/home/nly98977/.fhir/packages/ihe.rad.mado#current/package/StructureDefinition-MadoAnatomicalRegionExtension.json
+/home/nly98977/.fhir/packages/ihe.rad.mado#current/package/StructureDefinition-MadoComposition.json
+slice_signatures:
+accession-number
+accessionNumber
+data-absent-reason
+dataAbsentReason
+fhirReference
+koDocumentTitle
+kosReference
+retrieveLocationUid
+
+[dev]
+sample_files:
+/home/nly98977/.fhir/packages/ihe.rad.mado#dev/package/StructureDefinition-MadoAccessionNumberIdentifier.json
+/home/nly98977/.fhir/packages/ihe.rad.mado#dev/package/StructureDefinition-MadoAnatomicalRegionExtension.json
+/home/nly98977/.fhir/packages/ihe.rad.mado#dev/package/StructureDefinition-MadoComposition.json
+slice_signatures:
+accession-number
+data-absent-reason
+fhir-reference
+ko-document-title
+kos-reference
+retrieve-location-uid
+
