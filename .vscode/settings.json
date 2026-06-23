@@ -3,6 +3,10 @@
         "/^cd /home/nly98977/SwArchives/bvdh/hl7eu-imaging-manifest-ai-implementer && python3 scripts/extract-mado-ms-obligations\\.py 2>&1$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^cd /home/nly98977/SwArchives/bvdh/hl7eu-imaging-manifest-ai-implementer/imaging-manifest-fork && \\./_build\\.sh build$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }

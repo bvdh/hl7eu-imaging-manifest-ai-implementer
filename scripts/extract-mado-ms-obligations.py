@@ -198,19 +198,27 @@ def main():
             if not elem_path or '.' not in elem_path:
                 continue
             
-            # Extract field name (part after the last dot), preserving any slice notation (e.g., entry[slicename])
-            field_name = elem_path.split('.')[-1]            # Append slice name if present
-            if el.get('sliceName'):
-                field_name = f"{field_name}[{el.get('sliceName')}]"            # Append slice name if present
+            # Extract field path (everything after the profile name dot)
+            # elem_path format: ProfileName.path.to.element
+            # We want: path.to.element
+            parts = elem_path.split('.')
+            if len(parts) > 1:
+                field_path = '.'.join(parts[1:])
+                # Append slice name if present
+                if el.get('sliceName'):
+                    field_path = f"{field_path}[{el.get('sliceName')}]"
+            else:
+                continue
+            
             is_ms = 'MS' if el.get('mustSupport') is True else ''
             consumer_obl, producer_obl, obligation_req = extract_obligations(el, EU_CONSUMER, EU_PRODUCER)
             
             # Build IHE-MADO cross-reference (profile.field format)
-            ihe_cross_ref = f"{base_ihe_name}.{field_name}" if base_ihe_name else ''
+            ihe_cross_ref = f"{base_ihe_name}.{field_path}" if base_ihe_name else ''
             
             eu_rows.append(OrderedDict([
                 ('Profile', eu_name),
-                ('Field', field_name),
+                ('Field', field_path),
                 ('MS', is_ms),
                 ('IHE-MADO', ihe_cross_ref),
                 ('Consumer', consumer_obl),
@@ -296,15 +304,21 @@ def main():
                                         producer_obl = code
                         break
             
-            # Extract field name (part after the last dot), preserving any slice notation
-            field_name = elem_path.split('.')[-1]
-            # Append slice name if present
-            if el.get('sliceName'):
-                field_name = f"{field_name}[{el.get('sliceName')}]"
+            # Extract field path (everything after the profile name dot)
+            # elem_path format: ProfileName.path.to.element
+            # We want: path.to.element
+            parts = elem_path.split('.')
+            if len(parts) > 1:
+                field_path = '.'.join(parts[1:])
+                # Append slice name if present
+                if el.get('sliceName'):
+                    field_path = f"{field_path}[{el.get('sliceName')}]"
+            else:
+                continue
             
             ehds_rows.append(OrderedDict([
                 ('Profile', ehds_name),
-                ('Field', field_name),
+                ('Field', field_path),
                 ('Cross-reference', elem_path),
                 ('MS', is_ms),
                 ('Consumer', consumer_obl),
