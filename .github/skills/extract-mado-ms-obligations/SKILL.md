@@ -8,7 +8,7 @@ Extract profile field inventories with Must Support indicators and obligations a
 
 - **When to use**: Generate or refresh field inventory reports showing Must Support indicators and actor-specific obligations across IHE-MADO, EU imaging-manifest, and XtEHR EHDS systems
 - **Triggers**: "extract field inventories", "generate MS obligations report", "profile field inventory", "obligations mapping"
-- **Input**: FHIR StructureDefinition packages (IHE-MADO, EU imaging-manifest, XtEHR EHDS) and `input/mapping/mapping.csv`
+- **Input**: FHIR StructureDefinition packages (IHE-MADO, EU imaging-manifest, XtEHR EHDS) and `imaging-manifest-fork/input/mapping/mapping.csv`
 - **Output**: Seven CSV files in `ai-result/` directory with progressive enrichment
 
 ## Output Files
@@ -22,7 +22,7 @@ Extract profile field inventories with Must Support indicators and obligations a
 - **Deduplication**: After extraction, deduplicate rows so that each combination of (Profile, Field, MS) appears only once in the output
 
 ### Step 2: EU imaging-manifest Profile Fields (`step2-eu-mado.csv`)
-- **Source**: Generated EU EuMado* profiles from IG output; base profiles via `baseDefinition`
+- **Source**: Generated EU EuMado* profiles from `imaging-manifest-fork/output/`; base profiles via `baseDefinition`
 - **Rows**: 800+
 - **Columns**: Profile, Field, MS, IHE-MADO, Consumer, Producer, Documentation
 - **Purpose**: EU profiles with IHE-MADO base cross-references and obligation codes
@@ -62,12 +62,12 @@ Extract profile field inventories with Must Support indicators and obligations a
 - **Deduplication**: After combining, deduplicate rows so that each combination of (IHE-MADO, EU-MADO, MS, Consumer, Producer, Documentation, EHDS, EHDS-Consumer, EHDS-Producer) appears only once in the output
 
 ### Step 7: DICOM KOS Mappings (`step7-mapping.csv`)
-- **Source**: `input/mapping/mapping.csv`
+- **Source**: `imaging-manifest-fork/input/mapping/mapping.csv`
 - **Rows**: 200+ plus any explicit carry-through rows for unmatched `mapping.csv` entries
-- **Columns**: Concept	FHIR Imaging Study Manifest	Profile, EU-MADO,	DICOM KOS Manifest
-- **Purpose**: Parse mapping.csv to extract a more easily recognizable EU-MADO cross-refference to be used in step 8.
+- **Columns**: Concept, FHIR Imaging Study Manifest, IHE-MADO, DICOM KOS Manifest
+- **Purpose**: Parse mapping.csv to extract IHE-MADO profile references and DICOM KOS mappings for use in step 8.
+- **Column C (IHE-MADO)**: Contains the IHE-MADO profile path extracted from Column B (FHIR Imaging Study Manifest). If Column B contains "→", only the part after the last "→" is used.
 - **Cross-Reference Format**: All cross-reference columns retain slice notation from source systems
-- **Deduplication**: After enrichment, deduplicate rows so that each combination of (IHE-MADO, FHIR Imaging Study Manifest, EU-MADO, MS, Consumer, Producer, Documentation, EHDS, EHDS-Consumer, EHDS-Producer, DICOM-KOS) appears only once in the output
 
 ### Step 8: DICOM KOS Mappings (`step8-all.csv`)
 - **Source**: Step 6 + `step7-mapping.csv`
@@ -87,7 +87,7 @@ The extraction runs seven sequential steps:
 4. **Merge IHE/EU**: Combine Steps 1-2, merging MS indicators; deduplicate by all columns
 5. **Add EHDS References**: Find EHDS profile.field mentions in documentation; lookup obligations; deduplicate by all columns
 6. **EHDS-Only Fields**: Add unmapped EHDS fields with their XtEHR obligations; deduplicate by all columns
-7. **Add DICOM KOS Mappings**: Enrich Step 6 with DICOM KOS Manifest references from `input/mapping/mapping.csv`; deduplicate by all columns
+7. **Add DICOM KOS Mappings**: Enrich Step 6 with DICOM KOS Manifest references from `imaging-manifest-fork/input/mapping/mapping.csv`; deduplicate by all columns
   - Copy `mapping.csv` column B into a dedicated `FHIR Imaging Study Manifest` column in Step 7
   - A comma in column B is treated as a separator: each trimmed token becomes its own independent entry with the same `DICOM-KOS` value
   - If a `mapping.csv` row has no matching Step 6 `IHE-MADO` row, append it to Step 7 as an explicit output line with blank `IHE-MADO`, the mapping value in `FHIR Imaging Study Manifest`, and the mapped `DICOM-KOS` value
@@ -156,7 +156,7 @@ After running the extraction:
 ### Input Package Paths
 - IHE-MADO: `~/.fhir/packages/ihe.rad.mado#current/package/`
 - XtEHR EHDS: `~/.fhir/packages/xtehr.eu.ehds.models#1.0.0/package/`
-- EU profiles: `output/StructureDefinition-EuMado*.json`
+- EU profiles: `imaging-manifest-fork/output/StructureDefinition-EuMado*.json`
 
 ### Data Structures
 
@@ -179,7 +179,7 @@ http://hl7.org/fhir/StructureDefinition/obligation
 
 ## Constraints
 
-- DO NOT skip the IG build unless explicitly requested
+- DO NOT skip the IG build unless explicitly requested; when a build is required, `cd imaging-manifest-fork/` and run `./_build.sh build`
 - DO NOT invent profiles, elements, or Must Support flags
 - DO NOT mix systems in a single CSV; maintain sequential approach
 - ONLY populate cross-references where mapping can be traced
