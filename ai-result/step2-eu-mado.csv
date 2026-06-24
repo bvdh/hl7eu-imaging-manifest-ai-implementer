@@ -466,7 +466,7 @@ EuMadoImagingStudy,series.numberOfInstances,MS,MadoImagingStudy.series.numberOfI
 EuMadoImagingStudy,series.endpoint,,MadoImagingStudy.series.endpoint,,,
 EuMadoImagingStudy,series.endpoint[wado],MS,MadoImagingStudy.series.endpoint[wado],SHOULD:process,SHALL:populate,EHDSImagingStudy.endpoint & EHDSImagingStudy.series.seriesEndpoint
 EuMadoImagingStudy,series.bodySite,MS,MadoImagingStudy.series.bodySite,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.bodySite
-EuMadoImagingStudy,series.laterality,,MadoImagingStudy.series.laterality,,,
+EuMadoImagingStudy,series.laterality,MS,MadoImagingStudy.series.laterality,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.started
 EuMadoImagingStudy,series.specimen,MS,MadoImagingStudy.series.specimen,,SHALL:able-to-populate,Required by MADO
 EuMadoImagingStudy,series.started,MS,MadoImagingStudy.series.started,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.started
 EuMadoImagingStudy,series.performer,,MadoImagingStudy.series.performer,,,

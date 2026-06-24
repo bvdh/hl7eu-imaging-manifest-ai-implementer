@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-Step 1-7: Extract IHE-MADO, EU imaging-manifest, XtEHR EHDS, and merged field inventories.
+Step 1-9: Extract IHE-MADO, EU imaging-manifest, XtEHR EHDS, and merged field inventories.
 Step 7 adds DICOM KOS mappings from mapping.csv.
+Step 8 enriches mapping data with XtEHR model mappings from xtehr-model-mapping.csv.
+Step 9 produces final merged inventory.
 """
 
 import csv
@@ -25,8 +27,10 @@ OUT_CSV_ALL = 'ai-result/step4-ihe-eu-mado-fields.csv'
 OUT_CSV_FINAL = 'ai-result/step5-ihe-eu-mado-ehds-fields.csv'
 OUT_CSV_STEP6 = 'ai-result/step6-all-fields.csv'
 OUT_CSV_STEP7 = 'ai-result/step7-mapping.csv'
-OUT_CSV_STEP8 = 'ai-result/step8-all.csv'
+OUT_CSV_STEP8 = 'ai-result/step8-xtehr-enriched.csv'
+OUT_CSV_STEP9 = 'ai-result/step9-all.csv'
 MAPPING_CSV = 'imaging-manifest-fork/input/mapping/mapping.csv'
+XTEHR_MODEL_MAPPING_CSV = 'imaging-manifest-fork/input/mapping/xtehr-model-mapping.csv'
 
 # XtEHR Actor URIs
 XTE_CONSUMER = 'https://www.xt-ehr.eu/specifications/fhir/actor-consumer'
@@ -198,6 +202,68 @@ def _is_camel_vs_kebab_slice_mismatch(left_key, right_key):
             return True
 
     return False
+
+
+def load_xtehr_model_mappings():
+    """Load XtEHR model mappings from xtehr-model-mapping.csv.
+    
+    Returns dict: XtEHR class name -> { XtEHR field -> { 'eu_resource': str, 'eu_field': str } }
+    """
+    mappings = {}
+    if not os.path.isfile(XTEHR_MODEL_MAPPING_CSV):
+        print(f'Warning: XtEHR model mapping file {XTEHR_MODEL_MAPPING_CSV} not found.', file=sys.stderr)
+        return mappings
+    
+    try:
+        # Try UTF-8 first, fall back to Latin-1 if that fails
+        try:
+            with open(XTEHR_MODEL_MAPPING_CSV, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    xtehr_class = row.get('XtEHR Class', '').strip()
+                    xtehr_field = row.get('XtEHR field', '').strip()
+                    eu_resource = row.get('EuMado resource', '').strip()
+                    eu_field = row.get('EuMado field', '').strip()
+                    
+                    # Skip empty rows or rows without XtEHR class
+                    if not xtehr_class or not xtehr_field:
+                        continue
+                    
+                    if xtehr_class not in mappings:
+                        mappings[xtehr_class] = {}
+                    
+                    # Store mapping as dict for this field
+                    mappings[xtehr_class][xtehr_field] = {
+                        'eu_resource': eu_resource,
+                        'eu_field': eu_field,
+                    }
+        except UnicodeDecodeError:
+            # Fall back to Latin-1 encoding
+            print(f'Note: Retrying {XTEHR_MODEL_MAPPING_CSV} with Latin-1 encoding', file=sys.stderr)
+            with open(XTEHR_MODEL_MAPPING_CSV, 'r', encoding='latin-1') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    xtehr_class = row.get('XtEHR Class', '').strip()
+                    xtehr_field = row.get('XtEHR field', '').strip()
+                    eu_resource = row.get('EuMado resource', '').strip()
+                    eu_field = row.get('EuMado field', '').strip()
+                    
+                    # Skip empty rows or rows without XtEHR class
+                    if not xtehr_class or not xtehr_field:
+                        continue
+                    
+                    if xtehr_class not in mappings:
+                        mappings[xtehr_class] = {}
+                    
+                    # Store mapping as dict for this field
+                    mappings[xtehr_class][xtehr_field] = {
+                        'eu_resource': eu_resource,
+                        'eu_field': eu_field,
+                    }
+    except Exception as e:
+        print(f'Warning: Failed to load {XTEHR_MODEL_MAPPING_CSV}: {e}', file=sys.stderr)
+    
+    return mappings
 
 
 def main():
@@ -716,10 +782,122 @@ def main():
 
     print(f'WROTE {OUT_CSV_STEP7} rows={len(step7_rows)}')
 
-    # ===== STEP 8: Final merged inventory (Step 6 + Step 7 mapping data) =====
-    # Merge Step 6 rows with DICOM KOS mappings, then add unmapped mapping entries
+    # ===== STEP 8: Enrich with XtEHR model mappings =====
+    # This step enriches Step 7 mapping data and Step 6 EHDS-only rows with EU-MADO cross-references from XtEHR model mappings
+    xtehr_mappings = load_xtehr_model_mappings()
+    
+    # Count actual mappings loaded
+    actual_mapping_count = 0
+    for xtehr_class in xtehr_mappings.values():
+        for field_data in xtehr_class.values():
+            if field_data.get('eu_resource') and field_data.get('eu_field') and field_data.get('eu_resource') not in ('N/A', '.'):
+                actual_mapping_count += 1
+    
+    print(f'Loaded XtEHR model mappings: {len(xtehr_mappings)} classes, {actual_mapping_count} populated field mappings', file=sys.stderr)
+    
+    # Build a mapping dict of EHDS field -> EU-MADO for Step 6 enrichment
+    # Key: (EHDS class).(EHDS field), Value: (EU resource).(EU field)
+    xtehr_enrichments = {}
+    for xtehr_class, fields_dict in xtehr_mappings.items():
+        for xtehr_field, mapping_info in fields_dict.items():
+            eu_resource = mapping_info.get('eu_resource', '').strip()
+            eu_field = mapping_info.get('eu_field', '').strip()
+            if eu_resource and eu_field and eu_resource not in ('N/A', '.') and eu_field not in ('N/A', '.'):
+                ehds_key = f"{xtehr_class}.{xtehr_field}"
+                eu_mado_value = f"{eu_resource}.{eu_field}"
+                xtehr_enrichments[ehds_key] = eu_mado_value
+    
     step8_rows = []
-    step8_ihe_keys = set()
+    step7_enrichment_count = 0
+    step6_enrichment_count = 0
+    
+    # STEP 8A: Enrich Step 7 rows (DICOM KOS mappings)
+    with open(OUT_CSV_STEP7, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            concept = row.get('Concept', '').strip()
+            fhir_manifest = row.get('FHIR Imaging Study Manifest', '').strip()
+            ihe_mado = row.get('IHE-MADO', '').strip()
+            dicom_kos = row.get('DICOM KOS Manifest', '').strip()
+            
+            # Try to find matching XtEHR mappings
+            enriched_eu_mado = None
+            
+            # Strategy: extract profile and field from IHE-MADO, normalize field, match against XtEHR
+            # Example: "MadoImagingStudy.modality" -> ImagingStudy.modality -> EHDSImagingStudy.modality
+            if ihe_mado and '.' in ihe_mado:
+                ihe_parts = ihe_mado.split('.')
+                ihe_profile = ihe_parts[0]
+                ihe_field_part = '.'.join(ihe_parts[1:])
+                
+                # Normalize IHE field (remove slice notation for matching)
+                ihe_field_base = ihe_field_part.split('[')[0] if '[' in ihe_field_part else ihe_field_part
+                
+                # Try to find corresponding EHDS class and field in xtehr mappings
+                for xtehr_class in xtehr_mappings.keys():
+                    ihe_prof_lower = ihe_profile.lower()
+                    xtehr_lower = xtehr_class.lower()
+                    
+                    # Check if this could be a match
+                    if ('imagingstudy' in ihe_prof_lower and 'imagingstudy' in xtehr_lower) or \
+                       ('patient' in ihe_prof_lower and 'patient' in xtehr_lower):
+                        if ihe_field_base in xtehr_mappings[xtehr_class]:
+                            mapping_info = xtehr_mappings[xtehr_class][ihe_field_base]
+                            eu_resource = mapping_info.get('eu_resource', '').strip()
+                            eu_field = mapping_info.get('eu_field', '').strip()
+                            
+                            # Build EU-MADO cross-reference if both resource and field are populated
+                            if eu_resource and eu_field and eu_resource not in ('N/A', '.') and eu_field not in ('N/A', '.'):
+                                enriched_eu_mado = f"{eu_resource}.{eu_field}"
+                                step7_enrichment_count += 1
+            
+            # Store enriched mapping with metadata about source
+            row_out = OrderedDict([
+                ('Concept', concept),
+                ('FHIR Imaging Study Manifest', fhir_manifest),
+                ('IHE-MADO', ihe_mado),
+                ('DICOM KOS Manifest', dicom_kos),
+                ('EU-MADO-from-XtEHR', enriched_eu_mado if enriched_eu_mado else ''),
+                ('Enrichment-Note', 'Added from XtEHR mapping' if enriched_eu_mado else ''),
+            ])
+            
+            step8_rows.append(row_out)
+    
+    # STEP 8B: Enrich Step 6 EHDS-only rows (those with empty EU-MADO and non-empty EHDS)
+    step6_enriched_rows = []
+    with open(OUT_CSV_STEP6, 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            ihe_mado_col = row.get('IHE-MADO', '').strip()
+            eu_mado_col = row.get('EU-MADO', '').strip()
+            ehds_col = row.get('EHDS', '').strip()
+            
+            # Check if this is an EHDS-only row (empty IHE-MADO and EU-MADO, but has EHDS)
+            if not ihe_mado_col and not eu_mado_col and ehds_col and '.' in ehds_col:
+                # Try to find enrichment in xtehr_enrichments
+                if ehds_col in xtehr_enrichments:
+                    eu_mado_enriched = xtehr_enrichments[ehds_col]
+                    # Store for tracking (we'll update the row later in Step 9)
+                    step6_enriched_rows.append({
+                        'ehds_field': ehds_col,
+                        'enriched_eu_mado': eu_mado_enriched,
+                    })
+                    step6_enrichment_count += 1
+    
+    step8_rows = deduplicate_rows(step8_rows)
+    with open(OUT_CSV_STEP8, 'w', newline='', encoding='utf-8') as f:
+        if step8_rows:
+            w = csv.DictWriter(f, fieldnames=['Concept', 'FHIR Imaging Study Manifest', 'IHE-MADO', 'DICOM KOS Manifest', 'EU-MADO-from-XtEHR', 'Enrichment-Note'])
+            w.writeheader()
+            w.writerows(step8_rows)
+
+    print(f'WROTE {OUT_CSV_STEP8} rows={len(step8_rows)} with {step7_enrichment_count} Step 7 enrichments from XtEHR mappings')
+    print(f'Identified {step6_enrichment_count} Step 6 EHDS-only rows for EU-MADO enrichment', file=sys.stderr)
+
+    # ===== STEP 9: Final merged inventory (Step 7 + XtEHR enrichment + Step 6 mapping data) =====
+    # Merge Step 6 rows with DICOM KOS mappings, then add unmapped mapping entries
+    final_rows = []
+    step9_ihe_keys = set()
 
     # Build normalized key index only for mismatch diagnostics (strict matching is preserved).
     mapping_norm_to_keys = {}
@@ -738,22 +916,28 @@ def main():
             if ihe_mado and ihe_mado in mapping_fhir:
                 fhir_imaging_manifest = mapping_fhir[ihe_mado]
                 dicom_kos = mapping_dicom.get(ihe_mado, '')
-                step8_ihe_keys.add(ihe_mado)
+                step9_ihe_keys.add(ihe_mado)
             elif ihe_mado:
                 norm = _normalize_ihe_key_for_match(ihe_mado)
                 for candidate in mapping_norm_to_keys.get(norm, []):
                     if _is_camel_vs_kebab_slice_mismatch(ihe_mado, candidate):
                         print(
-                            f"WARNING Step8 slice-name mismatch (camelCase vs kebab-case): "
+                            f"WARNING Step9 slice-name mismatch (camelCase vs kebab-case): "
                             f"Step6 IHE-MADO '{ihe_mado}' vs mapping IHE-MADO '{candidate}'.",
                             file=sys.stderr,
                         )
                         break
             
-            step8_rows.append(OrderedDict([
+            # Apply XtEHR enrichments to EU-MADO if empty
+            eu_mado_value = row.get('EU-MADO', '').strip()
+            ehds_value = row.get('EHDS', '').strip()
+            if not eu_mado_value and ehds_value in xtehr_enrichments:
+                eu_mado_value = xtehr_enrichments[ehds_value]
+            
+            final_rows.append(OrderedDict([
                 ('IHE-MADO', row.get('IHE-MADO', '')),
                 ('FHIR Imaging Study Manifest', fhir_imaging_manifest),
-                ('EU-MADO', row.get('EU-MADO', '')),
+                ('EU-MADO', eu_mado_value),
                 ('MS', row.get('MS', '')),
                 ('Consumer', row.get('Consumer', '')),
                 ('Producer', row.get('Producer', '')),
@@ -766,9 +950,9 @@ def main():
 
     # Append mapping.csv rows that did not match any Step 6 IHE-MADO entry
     for fhir_col, ihe_mado_profile, dicom_col in mapping_entries:
-        if ihe_mado_profile in step8_ihe_keys:
+        if ihe_mado_profile in step9_ihe_keys:
             continue
-        step8_rows.append(OrderedDict([
+        final_rows.append(OrderedDict([
             ('IHE-MADO', ''),
             ('FHIR Imaging Study Manifest', fhir_col),
             ('EU-MADO', ''),  
@@ -782,15 +966,15 @@ def main():
             ('DICOM-KOS', dicom_col),
         ]))
 
-    # Deduplicate Step 8 rows
-    step8_rows = deduplicate_rows(step8_rows)
-    with open(OUT_CSV_STEP8, 'w', newline='', encoding='utf-8') as f:
-        if step8_rows:
+    # Deduplicate Step 9 rows
+    final_rows = deduplicate_rows(final_rows)
+    with open(OUT_CSV_STEP9, 'w', newline='', encoding='utf-8') as f:
+        if final_rows:
             w = csv.DictWriter(f, fieldnames=['IHE-MADO', 'FHIR Imaging Study Manifest', 'EU-MADO', 'MS', 'Consumer', 'Producer', 'Documentation', 'EHDS', 'EHDS-Consumer', 'EHDS-Producer', 'DICOM-KOS'])
             w.writeheader()
-            w.writerows(step8_rows)
+            w.writerows(final_rows)
 
-    print(f'WROTE {OUT_CSV_STEP8} rows={len(step8_rows)}')
+    print(f'WROTE {OUT_CSV_STEP9} rows={len(final_rows)}')
     
     return 0
 
