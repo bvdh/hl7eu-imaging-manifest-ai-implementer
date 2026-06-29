@@ -33,10 +33,14 @@ ADDED = ["EU-MADO Profile", "EU-MADO Field", "Consumer Obligation", "Producer Ob
 TAG_RE = re.compile(r"\(\s*([0-9A-Fa-f]{4})\s*,\s*([0-9A-Fa-f]{4})\s*\)")
 CODE_RE = re.compile(r"\b(\d{5,6})\b")
 
+# Module attribute tags whose FHIR target is not derivable from the step9 KOS tag
+# (the KOS references *Referenced* SOP UIDs, not the document's own SOP Common tags).
+TAG_OVERRIDE = {}
+
 
 def load_bridge():
     """Index step9 rows that carry a DICOM-KOS link, by tag and by SR concept code."""
-    by_tag, by_code = {}, {}
+    by_tag, by_code, by_field = {}, {}, {}
     for r in csv.DictReader(BRIDGE.open(encoding="utf-8")):
         kos = (r.get("DICOM-KOS") or "").strip()
         if not kos:
@@ -53,7 +57,9 @@ def load_bridge():
             by_tag.setdefault(f"({g1.upper()},{g2.upper()})", []).append(entry)
         for code in CODE_RE.findall(kos):
             by_code.setdefault(code, []).append(entry)
-    return by_tag, by_code
+        if fld:
+            by_field.setdefault(fld, []).append(entry)
+    return by_tag, by_code, by_field
 
 
 def merge(entries):
@@ -67,7 +73,7 @@ def merge(entries):
     }
 
 
-def enrich_modules(by_tag):
+def enrich_modules(by_tag, by_field):
     rows = list(csv.DictReader(MODULE_IN.open(encoding="utf-8")))
     cols = list(rows[0].keys()) + ADDED if rows else ADDED
     out = []
@@ -75,6 +81,8 @@ def enrich_modules(by_tag):
     for r in rows:
         tag = (r.get("Tag") or "").strip().upper().replace(" ", "")
         e = by_tag.get(tag, [])
+        if not e and tag in TAG_OVERRIDE:
+            e = by_field.get(TAG_OVERRIDE[tag], [])
         if e:
             hits += 1
         out.append({**r, **merge(e)})
@@ -105,8 +113,8 @@ def write(path, cols, rows):
 
 
 def main():
-    by_tag, by_code = load_bridge()
-    m_total, m_hit = enrich_modules(by_tag)
+    by_tag, by_code, by_field = load_bridge()
+    m_total, m_hit = enrich_modules(by_tag, by_field)
     t_total, t_hit = enrich_templates(by_code)
     print(f"modules:   {m_total} rows, {m_hit} matched -> {MODULE_OUT}")
     print(f"templates: {t_total} rows, {t_hit} matched -> {TEMPLATE_OUT}")
