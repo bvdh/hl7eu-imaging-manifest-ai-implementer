@@ -31,11 +31,19 @@ def slug(s):
 
 
 def th(cols):
-    return "      <tr>" + "".join(f"<th>{c}</th>" for c in cols) + "</tr>"
+    return "      <tr>" + "".join(f'<th style="text-align:center">{c}</th>' for c in cols) + "</tr>"
 
 
-def td(cells):
-    return "  <tr>" + "".join(f"<td>{esc(c)}</td>" for c in cells) + "</tr>"
+def colgroup(widths):
+    return "    <colgroup>" + "".join(f'<col style="width:{w}">' for w in widths) + "</colgroup>"
+
+
+def td(cells, left=()):
+    out = []
+    for i, c in enumerate(cells):
+        style = "" if i in left else ' style="text-align:center"'
+        out.append(f"<td{style}>{esc(c)}</td>")
+    return "  <tr>" + "".join(out) + "</tr>"
 
 
 def write_modules():
@@ -43,6 +51,7 @@ def write_modules():
     for r in csv.DictReader(MODULE_CSV.open(encoding="utf-8")):
         groups.setdefault(r["Module"], []).append(r)
     cols = ["Attribute Name", "Tag", "DICOM Type", "IHE Usage", "Consumer Obligation", "Producer Obligation"]
+    widths = ["26%", "9%", "8%", "9%", "24%", "24%"]
     for module, rows in groups.items():
         ref = rows[0]["DICOM Reference"]
         dicom_url = f"{PS3}sect_{ref}.html" if ref else ""
@@ -58,12 +67,13 @@ def write_modules():
         body.append('<div class="table-wrap">')
         body.append(f'  <table summary="{module} Module">')
         body.append(f"    <caption>{module} Module</caption>")
+        body.append(colgroup(widths))
         body.append("    <thead>")
         body.append(th(cols))
         body.append("    </thead>")
         body.append("    <tbody>")
         for r in rows:
-            body.append(td([r["Attribute Name"], r["Tag"], r["DICOM Type"], r["MADO IHE Usage"], r["Consumer Obligation"], r["Producer Obligation"]]))
+            body.append(td([r["Attribute Name"], r["Tag"], r["DICOM Type"], r["MADO IHE Usage"], r["Consumer Obligation"], r["Producer Obligation"]], left={0}))
         body.append("    </tbody>")
         body.append("  </table>")
         body.append("</div>")
@@ -77,6 +87,7 @@ def write_templates():
     for r in csv.DictReader(TEMPLATE_CSV.open(encoding="utf-8")):
         groups.setdefault((r["Template ID"], r["DICOM TID Name"]), []).append(r)
     cols = ["Row No", "NL", "REL with Parent", "VT", "Concept Name", "VM", "Req Type (DICOM)", "Req Type (IHE)", "Consumer Obligation", "Producer Obligation"]
+    widths = ["6%", "5%", "13%", "6%", "22%", "5%", "8%", "8%", "13.5%", "13.5%"]
     for (tid, name), rows in groups.items():
         d_url = rows[0]["DICOM Section URL"]
         m_url = rows[0]["MADO Page URL"]
@@ -92,12 +103,13 @@ def write_templates():
         body.append('<div class="table-wrap">')
         body.append(f'  <table summary="TID {tid} {name}">')
         body.append(f"    <caption>TID {tid} {name}</caption>")
+        body.append(colgroup(widths))
         body.append("    <thead>")
         body.append(th(cols))
         body.append("    </thead>")
         body.append("    <tbody>")
         for r in rows:
-            body.append(td([r["Row No"], r["NL"], r["REL with Parent"], r["VT"], r["Concept Name"], r["VM"], r["Req Type (DICOM)"], r["Req Type (IHE)"], r["Consumer Obligation"], r["Producer Obligation"]]))
+            body.append(td([r["Row No"], r["NL"], r["REL with Parent"], r["VT"], r["Concept Name"], r["VM"], r["Req Type (DICOM)"], r["Req Type (IHE)"], r["Consumer Obligation"], r["Producer Obligation"]], left={4}))
         body.append("    </tbody>")
         body.append("  </table>")
         body.append("</div>")
