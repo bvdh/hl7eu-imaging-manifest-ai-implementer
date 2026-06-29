@@ -58,30 +58,13 @@ Each generated file must contain:
 #### EHDSImagingStudy
 ```
 
-2. The standard alignment callout block:
-
-```html
-<div class="model-map-block">
-   <div class="callout-wrapper">
-      <div class="callout-box">
-
-<strong>Ongoing alignment:</strong>
-The Xt-EHR logical models are under active revision and continuous refinement.
-Updates from Xt-EHR will be progressively incorporated into this Implementation
-Guide to maintain alignment with the evolving EHDS specifications.
-
-      </div>
-   </div>
-</div>
-```
-
-3. The standard intro sentence:
+2. The standard intro sentence:
 
 ```md
 The following table shows the mapping from EHDSImagingStudy logical model elements to FHIR profiles.
 ```
 
-4. A mapping-context block linking the logical model:
+3. A mapping-context block linking the logical model:
 
 ```html
 <div class="table-wrap">
@@ -95,7 +78,7 @@ The following table shows the mapping from EHDSImagingStudy logical model elemen
 </div>
 ```
 
-5. A five-column HTML table with caption and two-row header:
+4. A five-column HTML table with caption and two-row header:
 
 ```html
 <div class="table-wrap">
@@ -223,7 +206,6 @@ Build each table from two sources:
 - A file exists for every EHDS profile with at least one xtehr-model-mapping.csv mapping.
 - No file exists for EHDS profiles that have no mappings in xtehr-model-mapping.csv unless the run explicitly asked for them.
 - Every file starts with `#### <EHDSProfile>`.
-- Every file includes the standard ongoing-alignment callout block.
 - Every file uses the five-column HTML table shape: Element | Resource | Element | DICOM KOS | Rationale.
 - The source logical model link matches the EHDS profile in the filename.
 - Every EHDS logical-model field defined for that profile is present in the table, even when no xtehr-model-mapping.csv mapping exists.
