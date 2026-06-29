@@ -3,16 +3,16 @@
 ## What This Skill Produces
 
 - Staged changes committed in both the root repository and the `imaging-manifest-fork` sub-repository
-- Single atomic commit message applied to both repos for consistency and traceability
+- **Separate, repo-scoped commit messages** applied to each repo (root message for root changes, fork message for fork changes)
 - Clear report of commit hashes and changed file counts per repository
-- Suggested commit message if none is provided (analyzed from staged changes)
+- Suggested commit messages if none provided (analyzed separately from staged changes in each repo)
 
 ## When To Use
 
 - Synchronize changes across the dual-repo structure when modifications span both root-level automation/scripts and IG content
-- Ensure related changes in both repos are tracked with identical commit messages for cross-repo traceability
+- Commit with repo-scoped messages that reflect only each repo's own changes
 - Atomic multi-repo commits without manual per-repo workflows
-- Maintain consistency when both `.github/` (root) and `imaging-manifest-fork/` (sub-repo) have correlated changes
+- Maintain clean git history where root-level work is documented in root commits and fork-level work in fork commits
 
 ## Decision Logic
 
@@ -34,24 +34,20 @@
    - List staged file paths (first 5)
    - Note unstaged/untracked files
 
-### Phase 2: Determine Commit Message
+### Phase 2: Determine Commit Messages
 
-**If message provided as argument:**
-- Use provided message directly
+**If single message provided as argument:**
+- Apply provided message to both repos (root and fork)
 
 **If no message provided:**
-- Analyze staged file patterns in both repos
-- Identify primary areas (FSH files, markdown pages, scripts, config, etc.)
-- Generate suggested message following pattern:
-  - `[area] Descriptive title (root + fork changes)` if both repos modified
-  - `[area] Descriptive title (fork only)` if only fork modified
-  - `[area] Descriptive title (root only)` if only root modified
-- Include count of modified files: `(N files total)`
-- Examples:
-  - `docs: Update volume pages with outline fixes and FHIR/DICOM section (mado-volume1, mado-volume3 profiles; 2 files)`
-  - `pages: Add FHIR and DICOM section to Volume 3 specification (2 files)`
-  - `automation: Extend build-ig skill with QA artifact verification (3 root files; 1 fork file)`
-- Report suggested message and require user confirmation before proceeding
+- Analyze staged file patterns **separately per repo**
+- Generate **distinct** messages for root repo and fork repo:
+  - **Root repo message**: Include only root-level changes (skills, scripts, automation, .github/ config)
+  - **Fork repo message**: Include only fork-level changes (FSH, markdown pages, diagrams, input/)
+- Each message should reflect only its repo's scope:
+  - Root example: `skills: Add commit-in-both-repos workflow skill (1 file)`
+  - Fork example: `docs: Update volume pages with FHIR/DICOM section and outline fixes (4 files)`
+- Report both suggested messages and require user confirmation before proceeding
 
 ### Phase 3: Stage Changes (if needed)
 
@@ -64,40 +60,47 @@
 1. Commit in root repo (if staged changes exist):
    ```bash
    cd /home/nly98977/SwArchives/bvdh/hl7eu-imaging-manifest-ai-implementer
-   git commit -m "MESSAGE"
+   git commit -m "ROOT_MESSAGE"
    ```
    - Capture commit hash and short message
+   - Use root-specific message (skills, automation, .github/ config)
 
 2. Commit in `imaging-manifest-fork/` (if staged changes exist):
    ```bash
    cd /home/nly98977/SwArchives/bvdh/hl7eu-imaging-manifest-ai-implementer/imaging-manifest-fork
-   git commit -m "MESSAGE"
+   git commit -m "FORK_MESSAGE"
    ```
    - Capture commit hash and short message
+   - Use fork-specific message (pages, profiles, diagrams, input/)
+   - **Do NOT mention root-level skills or automation in this message**
 
-### Phase 5: Report Results
+### Root repo commit message**: Exact message used (if commit created)
+  - Phase 5: Report Results
 
 Format report with:
-- **Commit message**: Exact message used
-- **Root repo**: Commit hash, file count
-- **Fork repo**: Commit hash, file count
+- **Root repo commit message**: Exact message used (if commit created)
+  - Commit hash and file count
+- **Fork repo commit message**: Exact message used (if commit created)
+  - Commit hash and file count
 - **Total changed files** across both repos
 - **Next action** (if any suggested): push, or further work
+- **Note**: Messages are repo-scoped—root mentions skills/automation, fork mentions content/profiles only
 
 ## Guardrails
 
-- Always use identical commit message in both repos for consistency
-- Require explicit message before committing if analyzing changes
+- **Use repo-scoped messages** (NOT identical messages): root message reflects root changes only, fork message reflects fork changes only
+- Require explicit message before committing if analyzing changes (unless user provides single message to apply to both)
 - Do not force-push or rewrite history; only forward commits allowed
 - Report both successes and failures clearly (if one repo fails, note both attempts)
 - Preserve sub-repo independence: do not alter `imaging-manifest-fork` as a Git submodule dependency (treat as independent repo)
-
+- Do not mention root-level changes (skills, scripts) in fork repo commit messages
 ## Completion Checks
 
-- Both repos have new commits with identical messages (where changes existed)
+- Both repos have new commits with repo-scoped messages (where changes existed)
 - Commit hashes are distinct (one per repo)
 - `git log --oneline -n 1` in each repo shows the new commit
-- Changed file count is reasonable (not accidentally committing everything)
+- Root commit message reflects only root-level changes
+- Fork commit message reflects only fork-level changes (no mention of root skills/automation)
 
 ## Related Skills
 

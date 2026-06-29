@@ -8,6 +8,14 @@
         "/^cd /home/nly98977/SwArchives/bvdh/hl7eu-imaging-manifest-ai-implementer/imaging-manifest-fork && \\./_build\\.sh build$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^cd /home/nly98977/SwArchives/bvdh/hl7eu-imaging-manifest-ai-implementer/imaging-manifest-fork && ls ig\\.ini sushi-config\\.yaml input-cache/publisher\\.jar 2>&1 && java -version 2>&1 \\| head -1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd /home/nly98977/SwArchives/bvdh/hl7eu-imaging-manifest-ai-implementer/imaging-manifest-fork && \\./_build\\.sh build 2>&1 \\| tail -60$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }

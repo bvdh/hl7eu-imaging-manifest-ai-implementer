@@ -1,0 +1,28 @@
+{
+  "modules": {
+    "accepted": 28,
+    "review": 0,
+    "duplicates_removed": 0,
+    "url_checks": {
+      "checks": 0,
+      "failures": 0
+    }
+  },
+  "templates": {
+    "accepted": 17,
+    "review": 0,
+    "duplicates_removed": 0,
+    "url_checks": {
+      "checks": 0,
+      "failures": 0
+    }
+  },
+  "skip_url_check": true,
+  "source": {
+    "pdf_url": "https://www.ihe.net/uploadedFiles/Documents/Radiology/IHE_RAD_Suppl_MADO.pdf",
+    "volume3_page_range": [
+      41,
+      80
+    ]
+  }
+}

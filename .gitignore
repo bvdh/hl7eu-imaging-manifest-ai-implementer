@@ -1,1 +1,4 @@
 imaging-manifest-fork/**
+.cache/**
+venv/lib/**
+venv/bin/**
