@@ -28,7 +28,26 @@ BRIDGE = Path("ai-result/step9-all.csv")
 MODULE_OUT = Path("ai-result/step11-dicom-module-fhir-obligations.csv")
 TEMPLATE_OUT = Path("ai-result/step11-dicom-template-fhir-obligations.csv")
 
+# Human-curated overlay: a reviewed copy of the module output whose curated
+# columns (manual FHIR mappings, MADO instructions, obligations, comments) take
+# precedence over the auto-derived bridge values. Matched per attribute row.
+MODULE_OVERLAY = Path("ai-result/step11-dicom-module-fhir-obligations-review.csv")
+
 ADDED = ["EU-MADO Profile", "EU-MADO Field", "Consumer Obligation", "Producer Obligation", "DICOM-KOS Match"]
+
+# Extra columns introduced by manual review that the bridge cannot derive.
+MADO_INSTRUCTION_COL = "MADO instruction"
+REVIEW_COMMENT_COL = "Review comment"
+
+# Columns the overlay may override. For these, a non-empty overlay value wins
+# over the auto-derived value; an empty overlay value leaves the auto value
+# untouched. MADO instruction and Review comment are taken verbatim from the
+# overlay (they have no auto-derived counterpart).
+OVERLAY_FILL_COLS = [
+    "MADO IHE Usage", "EU-MADO Profile", "EU-MADO Field",
+    "Consumer Obligation", "Producer Obligation", "DICOM-KOS Match",
+]
+OVERLAY_VERBATIM_COLS = [MADO_INSTRUCTION_COL, REVIEW_COMMENT_COL]
 
 TAG_RE = re.compile(r"\(\s*([0-9A-Fa-f]{4})\s*,\s*([0-9A-Fa-f]{4})\s*\)")
 CODE_RE = re.compile(r"\b(\d{5,6})\b")
@@ -73,11 +92,61 @@ def merge(entries):
     }
 
 
-def enrich_modules(by_tag, by_field):
+def overlay_key(row):
+    """Stable per-attribute key shared by the auto output and the curated overlay."""
+    return (
+        (row.get("Module") or "").strip(),
+        (row.get("Attribute Name") or "").strip(),
+        (row.get("Tag") or "").strip(),
+    )
+
+
+def load_overlay():
+    """Index the human-curated overlay rows by attribute key.
+
+    Returns an empty dict if the overlay file is absent, so the pipeline still
+    runs in environments where the review file has not been produced yet.
+    """
+    if not MODULE_OVERLAY.exists():
+        return {}
+    overlay = {}
+    for r in csv.DictReader(MODULE_OVERLAY.open(encoding="utf-8")):
+        overlay[overlay_key(r)] = r
+    return overlay
+
+
+def apply_overlay(row, ov):
+    """Overlay curated columns onto an auto-enriched row.
+
+    Fill columns: a non-empty overlay value replaces the auto value.
+    Verbatim columns: taken directly from the overlay (may be empty).
+    """
+    for col in OVERLAY_FILL_COLS:
+        val = (ov.get(col) or "").strip()
+        if val:
+            row[col] = val
+    for col in OVERLAY_VERBATIM_COLS:
+        row[col] = (ov.get(col) or "").strip()
+    return row
+
+
+def enrich_modules(by_tag, by_field, overlay):
     rows = list(csv.DictReader(MODULE_IN.open(encoding="utf-8")))
-    cols = list(rows[0].keys()) + ADDED if rows else ADDED
+    # Output column order: base columns with "MADO instruction" inserted after
+    # "MADO Description", then the auto-derived ADDED columns, then "Review comment".
+    base_cols = list(rows[0].keys()) if rows else []
+    cols = []
+    for c in base_cols:
+        cols.append(c)
+        if c == "MADO Description":
+            cols.append(MADO_INSTRUCTION_COL)
+    if MADO_INSTRUCTION_COL not in cols:
+        cols.append(MADO_INSTRUCTION_COL)
+    cols += ADDED + [REVIEW_COMMENT_COL]
+
     out = []
     hits = 0
+    overlaid = 0
     for r in rows:
         tag = (r.get("Tag") or "").strip().upper().replace(" ", "")
         e = by_tag.get(tag, [])
@@ -85,9 +154,14 @@ def enrich_modules(by_tag, by_field):
             e = by_field.get(TAG_OVERRIDE[tag], [])
         if e:
             hits += 1
-        out.append({**r, **merge(e)})
+        row = {**r, **merge(e), MADO_INSTRUCTION_COL: "", REVIEW_COMMENT_COL: ""}
+        ov = overlay.get(overlay_key(r))
+        if ov:
+            apply_overlay(row, ov)
+            overlaid += 1
+        out.append(row)
     write(MODULE_OUT, cols, out)
-    return len(out), hits
+    return len(out), hits, overlaid
 
 
 def enrich_templates(by_code):
@@ -114,9 +188,12 @@ def write(path, cols, rows):
 
 def main():
     by_tag, by_code, by_field = load_bridge()
-    m_total, m_hit = enrich_modules(by_tag, by_field)
+    overlay = load_overlay()
+    m_total, m_hit, m_overlaid = enrich_modules(by_tag, by_field, overlay)
     t_total, t_hit = enrich_templates(by_code)
-    print(f"modules:   {m_total} rows, {m_hit} matched -> {MODULE_OUT}")
+    print(f"modules:   {m_total} rows, {m_hit} matched, {m_overlaid} overlaid -> {MODULE_OUT}")
+    if not overlay:
+        print(f"           (no overlay found at {MODULE_OVERLAY}; auto values only)")
     print(f"templates: {t_total} rows, {t_hit} matched -> {TEMPLATE_OUT}")
 
 
