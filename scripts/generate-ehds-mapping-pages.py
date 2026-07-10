@@ -304,21 +304,6 @@ def generate_markdown_file(profile_name, rows):
     lines.append(f"#### {profile_name}")
     lines.append('')
     
-    # Alignment callout
-    lines.append('<div class="model-map-block">')
-    lines.append('  <div class="callout-wrapper">')
-    lines.append('    <div class="callout-box">')
-    lines.append('')
-    lines.append('<strong>Ongoing alignment:</strong>')
-    lines.append('The Xt-EHR logical models are under active revision and continuous refinement.')
-    lines.append('Updates from Xt-EHR will be progressively incorporated into this Implementation')
-    lines.append('Guide to maintain alignment with the evolving EHDS specifications.')
-    lines.append('')
-    lines.append('    </div>')
-    lines.append('  </div>')
-    lines.append('</div>')
-    lines.append('')
-    
     # Intro sentence
     lines.append(f'The following table shows the mapping from {profile_name} logical model elements to FHIR profiles.')
     lines.append('')

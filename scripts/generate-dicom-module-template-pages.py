@@ -19,7 +19,28 @@ MODULE_CSV = Path("ai-result/step11-dicom-module-fhir-obligations.csv")
 TEMPLATE_CSV = Path("ai-result/step11-dicom-template-fhir-obligations.csv")
 OUT = Path("imaging-manifest-fork/input/pagecontent")
 PS3 = "https://dicom.nema.org/medical/dicom/current/output/chtml/part03/"
+
+# The DICOM chtml output chunks modules at a coarser level than their
+# sub-subsection number, so f"sect_{ref}.html" 404s for most modules. Map each
+# module's DICOM Reference to its verified chtml page + table anchor.
+MODULE_DICOM_URL = {
+    "C.7.1.1": PS3 + "sect_C.7.html#table_C.7-1",
+    "C.7.2.1": PS3 + "sect_C.7.2.html#table_C.7-3",
+    "C.7.5.1": PS3 + "sect_C.7.5.html#table_C.7-8",
+    "C.12.1": PS3 + "sect_C.12.html#table_C.12-1",
+    "C.17.6.1": PS3 + "sect_C.17.6.html#table_C.17.6-1",
+    "C.17.6.2": PS3 + "sect_C.17.6.2.html#table_C.17.6-2",
+}
 MADO = "https://www.ihe.net/uploadedFiles/Documents/Radiology/IHE_RAD_Suppl_MADO.pdf"
+
+# Manual intro additions to preserve across regeneration. The generated intro
+# sentence is a fixed template; any extra sentence authored by hand is appended
+# here, keyed by module name (MODULE_INTRO_EXTRA) or template ID
+# (TEMPLATE_INTRO_EXTRA), so re-running this generator does not overwrite it.
+MODULE_INTRO_EXTRA = {}
+TEMPLATE_INTRO_EXTRA = {
+    "2010": "This template is used in the SR Document Module.",
+}
 
 
 def esc(t):
@@ -54,9 +75,11 @@ def write_modules():
     widths = ["26%", "9%", "8%", "9%", "24%", "24%"]
     for module, rows in groups.items():
         ref = rows[0]["DICOM Reference"]
-        dicom_url = f"{PS3}sect_{ref}.html" if ref else ""
+        dicom_url = MODULE_DICOM_URL.get(ref, f"{PS3}sect_{ref}.html") if ref else ""
         body = [f"#### {module} Module", ""]
-        body.append(f"DICOM {module} attributes (PS3.3 {ref}) with their IHE-MADO usage and EU-MADO Consumer/Producer obligations.")
+        intro = f"DICOM {module} attributes (PS3.3 {ref}) with their IHE-MADO usage and EU-MADO Consumer/Producer obligations."
+        extra = MODULE_INTRO_EXTRA.get(module)
+        body.append(f"{intro} {extra}" if extra else intro)
         body.append("")
         body.append("<ul>")
         if dicom_url:
@@ -92,7 +115,9 @@ def write_templates():
         d_url = rows[0]["DICOM Section URL"]
         m_url = rows[0]["MADO Page URL"]
         body = [f"#### TID {tid} {name}", ""]
-        body.append(f"DICOM SR template TID {tid} ({name}) nodes with DICOM/IHE requirement types and EU-MADO Consumer/Producer obligations.")
+        intro = f"DICOM SR template TID {tid} ({name}) nodes with DICOM/IHE requirement types and EU-MADO Consumer/Producer obligations."
+        extra = TEMPLATE_INTRO_EXTRA.get(tid)
+        body.append(f"{intro} {extra}" if extra else intro)
         body.append("")
         body.append("<ul>")
         if d_url:
