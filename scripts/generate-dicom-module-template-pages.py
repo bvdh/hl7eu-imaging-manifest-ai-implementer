@@ -39,7 +39,7 @@ MADO = "https://www.ihe.net/uploadedFiles/Documents/Radiology/IHE_RAD_Suppl_MADO
 # (TEMPLATE_INTRO_EXTRA), so re-running this generator does not overwrite it.
 MODULE_INTRO_EXTRA = {}
 TEMPLATE_INTRO_EXTRA = {
-    "2010": "This template is used in the SR Document Module.",
+    "2010": "This is used in the SR Document Module.",
 }
 
 
