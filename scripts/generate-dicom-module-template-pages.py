@@ -43,12 +43,30 @@ TEMPLATE_INTRO_EXTRA = {
 }
 
 
+# CodeSystem page that defines the obligation codes used in the Consumer/Producer
+# columns. Each code cell links to its concept anchor on this page.
+OBLIGATION_CS = "http://hl7.org/fhir/extensions/5.3.0/CodeSystem-obligation.html"
+
+
 def esc(t):
     return ("" if t is None else t).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
 def slug(s):
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+
+
+def oblig_anchor(code):
+    # FHIR CodeSystem page anchors keep alphanumerics/-/_/. and encode any other
+    # character as ".<decimal-codepoint>" (e.g. ":" -> ".58").
+    return "".join(ch if (ch.isalnum() or ch in "-_.") else f".{ord(ch)}" for ch in code)
+
+
+def oblig_link(code):
+    code = (code or "").strip()
+    if not code:
+        return ""
+    return f'<a href="{OBLIGATION_CS}#obligation-{oblig_anchor(code)}" target="_blank">{esc(code)}</a>'
 
 
 def th(cols):
@@ -59,11 +77,12 @@ def colgroup(widths):
     return "    <colgroup>" + "".join(f'<col style="width:{w}">' for w in widths) + "</colgroup>"
 
 
-def td(cells, left=()):
+def td(cells, left=(), raw=()):
     out = []
     for i, c in enumerate(cells):
         style = "" if i in left else ' style="text-align:center"'
-        out.append(f"<td{style}>{esc(c)}</td>")
+        content = c if i in raw else esc(c)
+        out.append(f"<td{style}>{content}</td>")
     return "  <tr>" + "".join(out) + "</tr>"
 
 
@@ -96,7 +115,7 @@ def write_modules():
         body.append("    </thead>")
         body.append("    <tbody>")
         for r in rows:
-            body.append(td([r["Attribute Name"], r["Tag"], r["DICOM Type"], r["MADO IHE Usage"], r["Consumer Obligation"], r["Producer Obligation"]], left={0}))
+            body.append(td([r["Attribute Name"], r["Tag"], r["DICOM Type"], r["MADO IHE Usage"], oblig_link(r["Consumer Obligation"]), oblig_link(r["Producer Obligation"])], left={0}, raw={4, 5}))
         body.append("    </tbody>")
         body.append("  </table>")
         body.append("</div>")
@@ -134,7 +153,7 @@ def write_templates():
         body.append("    </thead>")
         body.append("    <tbody>")
         for r in rows:
-            body.append(td([r["Row No"], r["NL"], r["REL with Parent"], r["VT"], r["Concept Name"], r["VM"], r["Req Type (DICOM)"], r["Req Type (IHE)"], r["Consumer Obligation"], r["Producer Obligation"]], left={4}))
+            body.append(td([r["Row No"], r["NL"], r["REL with Parent"], r["VT"], r["Concept Name"], r["VM"], r["Req Type (DICOM)"], r["Req Type (IHE)"], oblig_link(r["Consumer Obligation"]), oblig_link(r["Producer Obligation"])], left={4}, raw={8, 9}))
         body.append("    </tbody>")
         body.append("  </table>")
         body.append("</div>")
