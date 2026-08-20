@@ -314,7 +314,7 @@ def generate_markdown_file(profile_name, rows):
     lines.append('  <ul>')
     lines.append('    <li>')
     lines.append('      <strong>Source logical model:</strong>')
-    lines.append(f'      <a href="https://www.xt-ehr.eu/fhir/models/0.3.0/StructureDefinition-{profile_name}.html" target="_blank">{profile_name}</a>')
+    lines.append(f'      <a href="https://www.xt-ehr.eu/fhir/models/1.0.0/StructureDefinition-{profile_name}.html" target="_blank">{profile_name}</a>')
     lines.append('    </li>')
     lines.append('  </ul>')
     lines.append('</div>')

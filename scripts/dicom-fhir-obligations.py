@@ -44,7 +44,7 @@ REVIEW_COMMENT_COL = "Review comment"
 # untouched. MADO instruction and Review comment are taken verbatim from the
 # overlay (they have no auto-derived counterpart).
 OVERLAY_FILL_COLS = [
-    "MADO IHE Usage", "EU-MADO Profile", "EU-MADO Field",
+    "MADO IHE Usage", "MADO Description", "EU-MADO Profile", "EU-MADO Field",
     "Consumer Obligation", "Producer Obligation", "DICOM-KOS Match",
 ]
 OVERLAY_VERBATIM_COLS = [MADO_INSTRUCTION_COL, REVIEW_COMMENT_COL]
