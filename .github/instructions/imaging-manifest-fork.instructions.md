@@ -51,7 +51,14 @@ cd imaging-manifest-fork
 ./_build.sh notx         # offline build (no terminology server)
 ./_build.sh nosushi      # skip SUSHI, re-run publisher only
 ./_gencontinuous.sh      # watch mode for iterative authoring
+
+# Local terminology server (avoids public tx.fhir.org session drops on long builds)
+# Point at any running tx server (versioned endpoint, e.g. /r4), or launch FHIRsmith via Docker.
+TX_URL=http://localhost:8085/r4 ./_build.sh localtx   # build against a local/hosted tx server
+# The FHIRsmith launcher + tx-config live at the repo root: run ../startLocalTxServer.sh
 ```
+
+A thin repo-root wrapper `./build.sh` forwards to `_build.sh` (defaults to `localtx`).
 
 Use the `build-ig` skill for the full build lifecycle, QA validation, and failure triage.
 

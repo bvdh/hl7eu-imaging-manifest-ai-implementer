@@ -2,3 +2,5 @@ imaging-manifest-fork/**
 .cache/**
 venv/lib/**
 venv/bin/**
+build-log/**
+tx-data/**

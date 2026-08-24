@@ -9,6 +9,9 @@ This repository separates AI/automation tooling from the IG source.
 
 ```
 /                              ← automation root (this instruction applies here)
+├── build.sh                   ← root build wrapper (logs to build-log/)
+├── startLocalTxServer.sh      ← launch a local FHIRsmith terminology server (Docker)
+├── tx-config/                 ← FHIRsmith config (config.json, library.yml), seeded into tx-data/
 ├── scripts/                   ← pipeline scripts (JS, Python, shell)
 ├── ai-result/                 ← generated CSV artifacts from the pipeline
 ├── examples/                  ← DICOM example files
@@ -25,15 +28,32 @@ This repository separates AI/automation tooling from the IG source.
 
 # Building the IG
 
-Always `cd` into `imaging-manifest-fork/` before running any build command.
+Use the root `build.sh` wrapper (it logs to `build-log/`), or `cd` into the fork:
 
 ```sh
+# From the repo root:
+./build.sh                 # local-tx build (default), logs to build-log/
+./build.sh build           # standard build against public tx.fhir.org
+
+# Or from inside the fork:
 cd imaging-manifest-fork
-./_build.sh          # standard build
-./_build.sh -tx n/a  # offline (no terminology server)
+./_build.sh                # standard build
+./_build.sh -tx n/a        # offline (no terminology server)
+./_build.sh localtx        # against a local tx server ($TX_URL, default http://localhost:8085/r4)
 ```
 
-Never run build scripts from the repo root. The `validate.yml` workflow references these scripts and may need updating to reflect the new layout.
+## Local terminology server
+
+Long builds can lose the shared public tx.fhir.org session cache. Run a local
+FHIRsmith terminology server (the tx.fhir.org software) instead:
+
+```sh
+./startLocalTxServer.sh    # repo root; auto-seeds tx-config/ into tx-data/ (gitignored)
+# wait until: curl http://localhost:8085/r4/metadata  returns a CapabilityStatement
+TX_URL=http://localhost:8085/r4 ./build.sh localtx
+```
+
+The `validate.yml` workflow references the build scripts and may need updating to reflect the layout.
 
 Use the `build-ig` skill for the full build lifecycle, QA validation, and failure triage.
 

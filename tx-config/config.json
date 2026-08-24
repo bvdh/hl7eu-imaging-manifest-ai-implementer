@@ -1,0 +1,23 @@
+{
+  "hostName": "MADO local terminology server",
+  "server": {
+    "port": 3000,
+    "cors": {
+      "origin": true,
+      "credentials": true
+    }
+  },
+  "modules": {
+    "tx": {
+      "enabled": true,
+      "librarySource": "/app/data/library.yml",
+      "cacheTimeout": 30,
+      "expansionCacheSize": 1000,
+      "expansionCacheMemoryThreshold": 0,
+      "endpoints": [
+        { "path": "/r4", "fhirVersion": "4.0", "context": null },
+        { "path": "/r5", "fhirVersion": "5.0", "context": null }
+      ]
+    }
+  }
+}

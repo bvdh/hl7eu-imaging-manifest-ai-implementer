@@ -1,0 +1,32 @@
+# FHIRsmith terminology library for the MADO IG local server.
+# Loaded once at startup; restart the server after editing.
+# Files (except internal/ucum) are cached under <data>/terminology-cache/ and
+# downloaded from base.url on first use.
+
+base:
+  url: https://storage.googleapis.com/tx-fhir-org
+
+sources:
+  # Built-in code systems (no download)
+  - internal:lang
+  - internal:country
+  - internal:currency
+  - internal:mimetypes
+  - internal:usstates
+
+  # Units of measure (ships with the FHIRsmith image)
+  - ucum:tx/data/ucum-essence.xml
+
+  # FHIR NPM packages this IG needs (fetched from the FHIR package registry)
+  - npm:hl7.terminology
+  - npm:fhir.tx.support.r4
+  - npm:ihe.formatcode.fhir
+  - npm:fhir.dicom
+
+  # Optional large terminologies. Uncomment if the build reports unresolved
+  # SNOMED/LOINC codes; may require a license. For exact cache/db filenames see
+  # the production config at https://github.com/HealthIntersections/FHIRsmith (tx.fhir.org.yml).
+  - loinc:loinc-2.77-a.db
+  - loinc!:Loinc_2.82.db
+  - snomed:sct_test_20250909.cache
+  - snomed!:sct_intl_20250201.cache

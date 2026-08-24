@@ -1,7 +1,7 @@
 ---
 name: build-ig
 description: 'Run the full FHIR IG Publisher build lifecycle for RAD.MADO: preflight, publisher update, Sushi generation, IG publish, QA validation, and failure triage. Use for build, rebuild, offline build, no-sushi build, watch mode, and Docker-based publisher runs.'
-argument-hint: 'Goal: build | update | notx | nosushi | watch | docker | clean'
+argument-hint: 'Goal: build | update | notx | localtx | nosushi | watch | docker | clean'
 ---
 
 # Build IG
@@ -62,6 +62,17 @@ argument-hint: 'Goal: build | update | notx | nosushi | watch | docker | clean'
 3. Offline IG build (no terminology server)
 ```bash
 ./_build.sh notx
+```
+
+3a. Build against a local terminology server (avoids public tx.fhir.org session drops)
+```bash
+# Option A: point at an already-running tx server (use its versioned endpoint, e.g. /r4)
+TX_URL=http://localhost:8085/r4 ./_build.sh localtx
+
+# Option B: launch FHIRsmith (the tx.fhir.org software) in Docker first
+#   launcher + config live at the repo root; config auto-seeds into ./tx-data/
+(cd .. && ./startLocalTxServer.sh)                       # keep running (repo root)
+TX_URL=http://localhost:8085/r4 ./_build.sh localtx     # in the fork
 ```
 
 4. Build without Sushi
