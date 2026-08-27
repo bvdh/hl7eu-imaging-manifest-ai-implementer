@@ -130,6 +130,19 @@ OUTPUT_COLS = [
     "MADO Description",
 ]
 
+# MADO includes macro attributes that are not returned by the module section
+# lookup. Keep their normative DICOM types explicit so the generated KOS table
+# does not lose them during the DICOM/MADO merge.
+MADO_ONLY_DICOM_TYPES = {
+    ("Patient", "An identifier for the Patient", "(0010,0020)"): "1",
+    ("Patient", "Issuer of Patient ID", "(0010,0021)"): "3",
+    ("Patient", "Issuer of Patient ID Qualifiers Sequence", "(0010,0024)"): "1",
+    ("Patient", "Universal Entity ID", "(0040,0032)"): "1",
+    ("Patient", "Universal Entity ID Type", "(0040,0033)"): "1C",
+    ("SOP Common", "Universal Entity ID", "(0010,0032)"): "1",
+    ("SOP Common", "Universal Entity ID Type", "(0010,0033)"): "1C",
+}
+
 # ── DICOM PS3.3 HTML fetcher and parser ────────────────────────────────────────
 
 class _SectionTableParser(html.parser.HTMLParser):
@@ -519,12 +532,16 @@ def crosscheck(
         return "unknown"
 
     def _make_row(attr: str, tag: str, df: Optional[Dict], mf: Optional[Dict]) -> Dict:
+        type_key = (module["name"], attr, tag)
+        dicom_type = (df or {}).get("type", "")
+        if not dicom_type:
+            dicom_type = MADO_ONLY_DICOM_TYPES.get(type_key, "")
         return {
             "Module": module["name"],
             "DICOM Reference": module["dicom_ref"],
             "Attribute Name": attr or (mf or {}).get("attr") or (df or {}).get("attr", ""),
             "Tag": tag or "",
-            "DICOM Type": (df or {}).get("type", ""),
+            "DICOM Type": dicom_type,
             "MADO IHE Usage": (mf or {}).get("ihe_usage", ""),
             "in_dicom": "Y" if df else "",
             "in_mado": "Y" if mf else "",
