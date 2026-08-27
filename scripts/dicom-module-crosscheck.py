@@ -143,6 +143,18 @@ MADO_ONLY_DICOM_TYPES = {
     ("SOP Common", "Universal Entity ID Type", "(0010,0033)"): "1C",
 }
 
+MANUAL_MADO_FIELDS = {
+    "Key Object Document Series": [
+        {
+            "attr": "Reference Request Sequence",
+            "tag": "(0040,A370)",
+            "ihe_usage": "R+",
+            "description": "Reference to the request associated with the Key Object Document Series.",
+            "source_page": 48,
+        }
+    ]
+}
+
 # ── DICOM PS3.3 HTML fetcher and parser ────────────────────────────────────────
 
 class _SectionTableParser(html.parser.HTMLParser):
@@ -594,6 +606,7 @@ def main() -> int:
 
         dicom_f = get_dicom_fields(ref)
         mado_f = get_mado_fields(name, mod["mado_pages"], mod.get("table_patterns"))
+        mado_f.extend(MANUAL_MADO_FIELDS.get(name, []))
         rows = crosscheck(mod, dicom_f, mado_f)
         all_rows.extend(rows)
 

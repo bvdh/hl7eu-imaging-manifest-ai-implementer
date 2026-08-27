@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check that DICOM-KOS source tables changed only in approved DICOM Types."""
+"""Check that DICOM-KOS source tables changed only in approved fields."""
 
 import csv
 import io
@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = Path("ai-result/step11-dicom-module-fhir-obligations.csv")
 TEMPLATE_PATH = Path("ai-result/step11-dicom-template-fhir-obligations.csv")
 REPORT = ROOT / "ai-result/dicom-kos-table-discrepancies.md"
+ALLOWED_CHANGED_FIELDS = {"DICOM Type", "Consumer Obligation", "Producer Obligation"}
 DISCREPANCIES: list[tuple[str, tuple[str, ...], str, str, str]] = []
 
 
@@ -39,24 +40,25 @@ def compare(path: Path, key_columns: tuple[str, ...]) -> list[str]:
         old, new = before_by_key[row_key], after_by_key[row_key]
         row_key = key(new)
         changed = [column for column in old if old.get(column, "") != new.get(column, "")]
-        if changed != ([] if not changed else ["DICOM Type"]):
+        if any(column not in ALLOWED_CHANGED_FIELDS for column in changed):
             errors.append(f"{path}: {row_key}: changed {changed}")
-        elif changed == ["DICOM Type"]:
-            DISCREPANCIES.append((str(path), row_key, "DICOM Type", old.get("DICOM Type", ""), new.get("DICOM Type", "")))
+        else:
+            for field in changed:
+                DISCREPANCIES.append((str(path), row_key, field, old.get(field, ""), new.get(field, "")))
     return errors
 
 
 def main() -> int:
     errors = compare(MODULE_PATH, ("Module", "Attribute Name", "Tag"))
     errors.extend(compare(TEMPLATE_PATH, ("Template ID", "Row No", "Concept Name")))
-    lines = ["# DICOM-KOS Table Discrepancies", "", "The following table lists every allowed change. Any change outside `DICOM Type` fails the check.", "", "| Source table | Row identity | Field | Before | After | Result |", "|---|---|---|---|---|---|"]
+    lines = ["# DICOM-KOS Table Discrepancies", "", "The following table lists every allowed DICOM Type or obligation change. Any other field change fails the check.", "", "| Source table | Row identity | Field | Before | After | Result |", "|---|---|---|---|---|---|"]
     for source, row_key, field, before, after in DISCREPANCIES:
         identity = " + ".join(row_key).replace("|", "\\|")
         lines.append(f"| {source} | {identity} | {field} | {before} | {after} | APPROVED |")
     for error in errors:
         lines.append(f"| source CSV | n/a | integrity | n/a | n/a | FAIL: {error.replace('|', '\\|')} |")
     if not errors:
-        lines.append("| module/template source CSVs | all rows | non-Type fields | unchanged | unchanged | PASS |")
+        lines.append("| module/template source CSVs | all rows | non-approved fields | unchanged | unchanged | PASS |")
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(REPORT)
     if errors:

@@ -34,6 +34,8 @@ TEMPLATE_OUT = Path("ai-result/step11-dicom-template-fhir-obligations.csv")
 MODULE_OVERLAY = Path("ai-result/step11-dicom-module-fhir-obligations-review.csv")
 
 ADDED = ["EU-MADO Profile", "EU-MADO Field", "Consumer Obligation", "Producer Obligation", "DICOM-KOS Match"]
+DEFAULT_CONSUMER_OBLIGATION = "SHOULD:process"
+DEFAULT_PRODUCER_OBLIGATION = "SHALL:able-to-populate"
 
 # Extra columns introduced by manual review that the bridge cannot derive.
 MADO_INSTRUCTION_COL = "MADO instruction"
@@ -130,6 +132,17 @@ def apply_overlay(row, ov):
     return row
 
 
+def apply_ihe_usage_obligations(row):
+    """Give every IHE-used row each missing default obligation."""
+    usage = (row.get("MADO IHE Usage") or row.get("Req Type (IHE)") or "").strip()
+    if usage:
+        if not (row.get("Consumer Obligation") or "").strip():
+            row["Consumer Obligation"] = DEFAULT_CONSUMER_OBLIGATION
+        if not (row.get("Producer Obligation") or "").strip():
+            row["Producer Obligation"] = DEFAULT_PRODUCER_OBLIGATION
+    return row
+
+
 def enrich_modules(by_tag, by_field, overlay):
     rows = list(csv.DictReader(MODULE_IN.open(encoding="utf-8")))
     # Output column order: base columns with "MADO instruction" inserted after
@@ -159,6 +172,7 @@ def enrich_modules(by_tag, by_field, overlay):
         if ov:
             apply_overlay(row, ov)
             overlaid += 1
+        apply_ihe_usage_obligations(row)
         out.append(row)
     write(MODULE_OUT, cols, out)
     return len(out), hits, overlaid
@@ -174,7 +188,7 @@ def enrich_templates(by_code):
         e = [x for c in codes for x in by_code.get(c, [])]
         if e:
             hits += 1
-        out.append({**r, **merge(e)})
+        out.append(apply_ihe_usage_obligations({**r, **merge(e)}))
     write(TEMPLATE_OUT, cols, out)
     return len(out), hits
 
