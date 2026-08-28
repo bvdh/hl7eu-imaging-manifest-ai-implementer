@@ -39,6 +39,13 @@ FIELD_STATE_COL = "Field State"
 DEFAULT_CONSUMER_OBLIGATION = "SHOULD:process"
 DEFAULT_PRODUCER_OBLIGATION = "SHALL:able-to-populate"
 
+TEMPLATE_OBLIGATION_OVERRIDES = {
+    ("2010", "4b", 'EV (121023, DCM, "Procedure Code")'):
+        ("", "SHALL-populate", "lean"),
+    ("2010", "7", 'EV (113012, DCM, "Key Object Description")'):
+        ("SHOULD:process", "SHALL:able-to-populate", "lean"),
+}
+
 # Extra columns introduced by manual review that the bridge cannot derive.
 MADO_INSTRUCTION_COL = "MADO instruction"
 REVIEW_COMMENT_COL = "Review comment"
@@ -210,7 +217,12 @@ def enrich_templates(by_code):
             hits += 1
         row = {**r, **merge(e)}
         row = apply_ihe_usage_obligations(row)
+        override = TEMPLATE_OBLIGATION_OVERRIDES.get((row.get("Template ID", ""), row.get("Row No", ""), row.get("Concept Name", "")))
+        if override:
+            row["Consumer Obligation"], row["Producer Obligation"], row[FIELD_STATE_COL] = override
         row[FIELD_STATE_COL] = field_state(row, "Req Type (IHE)")
+        if override:
+            row[FIELD_STATE_COL] = override[2]
         out.append(row)
     write(TEMPLATE_OUT, cols, out)
     return len(out), hits

@@ -156,25 +156,32 @@ Use an available spellchecker or linter when present, but manually review domain
 
 ### 3. Check work-note validity
 
-When the guide contains a work note, meeting note, issue list, or implementation checklist, audit every actionable item against the current authoritative source and build state. Do not assume that an item is still open because it appears in the note, and do not assume it is complete because the IG builds.
+When the guide contains `worknote.html` includes, audit every included work note against the current authoritative source and build state. Do not assume that an item is still open because it appears in the note, and do not assume it is complete because the IG builds.
 
-1. Enumerate each distinct request, proposed wording change, technical change, and follow-up in the note. Split compound bullets into separate checks when they can have different outcomes.
-2. Locate the owning source for each item in `input/`, `sushi-config.yaml`, scripts, or the resolved dependency package.
-3. Check the current implementation and, where relevant, the generated artifact or publisher QA result.
-4. Classify each item as one of:
+1. Scan the authoritative IG source for every `worknote.html` include, including Markdown and HTML attributes:
+
+```sh
+rg -n -i 'worknote\.html' input
+```
+
+2. List every match before evaluating it. Record the exact source file and line, plus the complete `text` or equivalent note content.
+3. Enumerate each distinct request, proposed wording change, technical change, and follow-up in each discovered include. Split compound notes into separate checks when they can have different outcomes.
+4. Locate the owning source for each item in `input/`, `sushi-config.yaml`, scripts, or the resolved dependency package.
+5. Check the current implementation and, where relevant, the generated artifact or publisher QA result.
+6. Classify each item as one of:
 	- `Completed`: implemented and supported by current source/build evidence.
 	- `Still required`: not implemented and still applicable.
 	- `Partially completed`: some requested aspects are implemented, but a remaining aspect is open.
 	- `No longer applicable`: superseded by a newer specification, dependency, design, or decision.
 	- `Blocked`: still applicable, but verification or implementation depends on an unavailable external change.
 	- `Needs decision`: the note is ambiguous or requires an explicit product/specification decision.
-5. Report every item in a table. The `Work-note file` column must identify the exact note or checklist file containing the item, using a workspace-relative path when possible:
+7. Report every discovered include and each actionable item in a table. The `Work-note file` column must identify the exact note or checklist file containing the item, using a workspace-relative path when possible. Include notes with no actionable items as `No actionable request` rather than silently omitting them:
 
-| Work-note file | Work-note item | Current evidence | Status | Remaining action or rationale |
-|---|---|---|---|
-| `doc/2026-08-27-meeting-note.md` | Exact short description | Source path, generated artifact, build output, or dependency evidence | One classification above | What remains, or why it is complete/outdated |
+| Work-note file | Include location | Work-note item | Current evidence | Status | Remaining action or rationale |
+|---|---|---|---|---|---|
+| `input/pagecontent/index.md` | `worknote.html` at line 39 | Exact short description | Source path, generated artifact, build output, or dependency evidence | One classification above | What remains, or why it is complete/outdated |
 
-6. For completed items, cite the current source or generated evidence. For open items, identify the smallest owning change. For no-longer-applicable items, state what superseded them. If an item is derived from multiple notes, list each relevant work-note file. Do not edit the work note as part of this audit unless the user explicitly requests note maintenance.
+8. For completed items, cite the current source or generated evidence. For open items, identify the smallest owning change. For no-longer-applicable items, state what superseded them. If an item is derived from multiple notes, list each relevant work-note file. Do not edit the work note as part of this audit unless the user explicitly requests note maintenance.
 
 ### 4. Apply the smallest source changes
 
@@ -254,7 +261,34 @@ Read the summary fields from `output/qa.json`:
 - `hints`
 - build timestamp and version
 
-Report errors first. Distinguish pre-existing warnings from warnings introduced by the change when a baseline is available. A successful build with warnings is not the same as a clean QA result.
+Produce a complete QA report containing every check that was performed and every issue found. Do not report only the final build status.
+
+First report the checks performed in a table:
+
+| Check ID | Check performed | Scope / command | Evidence inspected | Result |
+|---|---|---|---|---|
+| `QA-01` | Profile and artifact references | `input/pagecontent`, `input/fsh` | Source references and dependency metadata | Pass / Fail / Not run |
+
+Include rows for every applicable procedure section, at minimum:
+
+- Profile, actor, capability, and specification-reference checks.
+- Jekyll alias and rendered-token checks.
+- Work-note include discovery and per-note validity checks.
+- Obligation-to-Must-Support consistency checks.
+- Profile and named-slice example coverage checks.
+- Spelling and grammar review.
+- IG build and example validation.
+- Publisher QA, broken-link, and required-artifact checks.
+
+Then report issues in severity order in a separate table:
+
+| Severity | Issue ID | Finding | File / artifact | Evidence | Status or next action |
+|---|---|---|---|---|---|
+| `Error` | `ISSUE-001` | Concrete problem | Workspace-relative path or generated artifact | Command output or source evidence | Required fix or disposition |
+
+Use these severity levels: `Error`, `Warning`, `Info`, and `Note`. Include publisher warnings and unresolved coverage gaps when applicable, even if the build succeeds. Mark pre-existing issues separately from issues introduced by the current change when a baseline is available. If no issues are found, include an explicit `No issues found` row. Do not hide skipped or unavailable checks; mark them `Not run` with the reason.
+
+Report errors first in the narrative summary, followed by warnings, informational findings, and notes. Include the QA counts (`errs`, `warnings`, `hints`, broken links), build timestamp/version, check count by result, and issue count by severity. A successful build with warnings or skipped checks is not a clean QA result.
 
 ## Completion Criteria
 
@@ -262,6 +296,8 @@ The check is complete when:
 
 - All named profile, actor, and capability references in scope have an authoritative target.
 - Every actionable work-note item in scope has been checked against current source and classified with evidence.
+- The final report lists every applicable check performed, including scope, evidence, and result.
+- The final report lists every issue found, ordered by severity, including file/artifact, evidence, and disposition; skipped checks are reported with reasons.
 - Every locally authored obligation-bearing FHIR element has been checked in the generated snapshot and is marked `mustSupport: true`, or any dependency-only exception is reported explicitly.
 - Every reference to a dependency specification matches the version configured in `sushi-config.yaml`; `dev` and `build` dependencies use the corresponding `build.fhir.org` URL.
 - The skill memory in [spec-locations.md](./references/spec-locations.md) records the verified locations used by the check, including any newly discovered or corrected mappings.
