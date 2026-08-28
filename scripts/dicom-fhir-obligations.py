@@ -34,6 +34,8 @@ TEMPLATE_OUT = Path("ai-result/step11-dicom-template-fhir-obligations.csv")
 MODULE_OVERLAY = Path("ai-result/step11-dicom-module-fhir-obligations-review.csv")
 
 ADDED = ["EU-MADO Profile", "EU-MADO Field", "Consumer Obligation", "Producer Obligation", "DICOM-KOS Match"]
+TID_CONTEXT_COL = "TID 1602 Context"
+FIELD_STATE_COL = "Field State"
 DEFAULT_CONSUMER_OBLIGATION = "SHOULD:process"
 DEFAULT_PRODUCER_OBLIGATION = "SHALL:able-to-populate"
 
@@ -140,7 +142,18 @@ def apply_ihe_usage_obligations(row):
             row["Consumer Obligation"] = DEFAULT_CONSUMER_OBLIGATION
         if not (row.get("Producer Obligation") or "").strip():
             row["Producer Obligation"] = DEFAULT_PRODUCER_OBLIGATION
+    if (row.get("Producer Obligation") or "").strip().startswith("SHALL:"):
+        row["Consumer Obligation"] = DEFAULT_CONSUMER_OBLIGATION
     return row
+
+
+def field_state(row, usage_column):
+    if (row.get("Template ID") or "").strip() == "16XX":
+        return "ignore"
+    usage = (row.get(usage_column) or "").strip()
+    consumer = (row.get("Consumer Obligation") or "").strip()
+    producer = (row.get("Producer Obligation") or "").strip()
+    return "lean" if usage or consumer or producer else "full"
 
 
 def enrich_modules(by_tag, by_field, overlay):
@@ -156,6 +169,8 @@ def enrich_modules(by_tag, by_field, overlay):
     if MADO_INSTRUCTION_COL not in cols:
         cols.append(MADO_INSTRUCTION_COL)
     cols += ADDED + [REVIEW_COMMENT_COL]
+    if FIELD_STATE_COL not in cols:
+        cols.append(FIELD_STATE_COL)
 
     out = []
     hits = 0
@@ -173,6 +188,7 @@ def enrich_modules(by_tag, by_field, overlay):
             apply_overlay(row, ov)
             overlaid += 1
         apply_ihe_usage_obligations(row)
+        row[FIELD_STATE_COL] = field_state(row, "MADO IHE Usage")
         out.append(row)
     write(MODULE_OUT, cols, out)
     return len(out), hits, overlaid
@@ -181,6 +197,10 @@ def enrich_modules(by_tag, by_field, overlay):
 def enrich_templates(by_code):
     rows = list(csv.DictReader(TEMPLATE_IN.open(encoding="utf-8")))
     cols = list(rows[0].keys()) + ADDED if rows else ADDED
+    if TID_CONTEXT_COL not in cols:
+        cols.append(TID_CONTEXT_COL)
+    if FIELD_STATE_COL not in cols:
+        cols.append(FIELD_STATE_COL)
     out = []
     hits = 0
     for r in rows:
@@ -188,7 +208,13 @@ def enrich_templates(by_code):
         e = [x for c in codes for x in by_code.get(c, [])]
         if e:
             hits += 1
-        out.append(apply_ihe_usage_obligations({**r, **merge(e)}))
+        row = {**r, **merge(e)}
+        row = apply_ihe_usage_obligations(row)
+        if not row.get(TID_CONTEXT_COL):
+            has_obligation = bool((row.get("Consumer Obligation") or "").strip() or (row.get("Producer Obligation") or "").strip())
+            row[TID_CONTEXT_COL] = "1602-s;1602-i" if row.get("Template ID") == "1602" and has_obligation else ""
+        row[FIELD_STATE_COL] = field_state(row, "Req Type (IHE)")
+        out.append(row)
     write(TEMPLATE_OUT, cols, out)
     return len(out), hits
 

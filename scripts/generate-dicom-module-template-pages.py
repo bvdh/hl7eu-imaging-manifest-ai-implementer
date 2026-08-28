@@ -17,7 +17,7 @@ from pathlib import Path
 
 MODULE_CSV = Path("ai-result/step11-dicom-module-fhir-obligations.csv")
 TEMPLATE_CSV = Path("ai-result/step11-dicom-template-fhir-obligations.csv")
-OUT = Path("imaging-manifest-fork/input/pagecontent")
+OUT = Path("imaging-manifest-fork/input/pagecontent/kos")
 PS3 = "https://dicom.nema.org/medical/dicom/current/output/chtml/part03/"
 
 # The DICOM chtml output chunks modules at a coarser level than their
@@ -69,6 +69,12 @@ def oblig_link(code):
     return f'<a href="{OBLIGATION_CS}#obligation-{oblig_anchor(code)}" target="_blank">{esc(code)}</a>'
 
 
+def normalize_obligations(row):
+    producer = (row.get("Producer Obligation") or "").strip()
+    if producer.startswith("SHALL:"):
+        row["Consumer Obligation"] = "SHOULD:process"
+
+
 def th(cols):
     return "      <tr>" + "".join(f'<th style="text-align:center">{c}</th>' for c in cols) + "</tr>"
 
@@ -89,76 +95,88 @@ def td(cells, left=(), raw=()):
 def write_modules():
     groups = OrderedDict()
     for r in csv.DictReader(MODULE_CSV.open(encoding="utf-8")):
+        normalize_obligations(r)
         groups.setdefault(r["Module"], []).append(r)
     cols = ["Attribute Name", "Tag", "DICOM Type", "IHE Usage", "Consumer Obligation", "Producer Obligation"]
     widths = ["26%", "9%", "8%", "9%", "24%", "24%"]
-    for module, rows in groups.items():
-        ref = rows[0]["DICOM Reference"]
-        dicom_url = MODULE_DICOM_URL.get(ref, f"{PS3}sect_{ref}.html") if ref else ""
-        body = [f"#### {module} Module", ""]
-        intro = f"DICOM {module} attributes (PS3.3 {ref}) with their IHE-MADO usage and EU-MADO Consumer/Producer obligations."
-        extra = MODULE_INTRO_EXTRA.get(module)
-        body.append(f"{intro} {extra}" if extra else intro)
-        body.append("")
-        body.append("<ul>")
-        if dicom_url:
-            body.append(f'  <li><strong>DICOM source:</strong> <a href="{dicom_url}" target="_blank">PS3.3 {ref}</a></li>')
-        body.append(f'  <li><strong>IHE-MADO:</strong> <a href="{MADO}" target="_blank">IHE RAD MADO supplement</a></li>')
-        body.append("</ul>")
-        body.append("")
-        body.append('<div class="table-wrap">')
-        body.append(f'  <table summary="{module} Module">')
-        body.append(f"    <caption>{module} Module</caption>")
-        body.append(colgroup(widths))
-        body.append("    <thead>")
-        body.append(th(cols))
-        body.append("    </thead>")
-        body.append("    <tbody>")
-        for r in rows:
-            body.append(td([r["Attribute Name"], r["Tag"], r["DICOM Type"], r["MADO IHE Usage"], oblig_link(r["Consumer Obligation"]), oblig_link(r["Producer Obligation"])], left={0}, raw={4, 5}))
-        body.append("    </tbody>")
-        body.append("  </table>")
-        body.append("</div>")
-        body.append("")
-        (OUT / f"dicom-module-{slug(module)}.md").write_text("\n".join(body), encoding="utf-8")
+    for module, all_rows in groups.items():
+        for variant in ("full", "lean"):
+            rows = all_rows if variant == "full" else [r for r in all_rows if r.get("Field State", "").strip() == "lean"]
+            ref = rows[0]["DICOM Reference"] if rows else all_rows[0]["DICOM Reference"]
+            dicom_url = MODULE_DICOM_URL.get(ref, f"{PS3}sect_{ref}.html") if ref else ""
+            body = [f"#### {module} Module", ""]
+            intro = f"DICOM {module} attributes (PS3.3 {ref}) with their IHE-MADO usage and EU-MADO Consumer/Producer obligations."
+            extra = MODULE_INTRO_EXTRA.get(module)
+            body.append(f"{intro} {extra}" if extra else intro)
+            body.append("")
+            body.append("<ul>")
+            if dicom_url:
+                body.append(f'  <li><strong>DICOM source:</strong> <a href="{dicom_url}" target="_blank">PS3.3 {ref}</a></li>')
+            body.append(f'  <li><strong>IHE-MADO:</strong> <a href="{MADO}" target="_blank">IHE RAD MADO supplement</a></li>')
+            body.append("</ul>")
+            body.append("")
+            body.append('<div class="table-wrap">')
+            body.append(f'  <table summary="{module} Module">')
+            body.append(f"    <caption>{module} Module</caption>")
+            body.append(colgroup(widths))
+            body.append("    <thead>")
+            body.append(th(cols))
+            body.append("    </thead>")
+            body.append("    <tbody>")
+            for r in rows:
+                body.append(td([r["Attribute Name"], r["Tag"], r["DICOM Type"], r["MADO IHE Usage"], oblig_link(r["Consumer Obligation"]), oblig_link(r["Producer Obligation"])], left={0}, raw={4, 5}))
+            body.append("    </tbody>")
+            body.append("  </table>")
+            body.append("</div>")
+            body.append("")
+            (OUT / f"dicom-module-{slug(module)}-{variant}.md").write_text("\n".join(body), encoding="utf-8")
     return list(groups)
 
 
 def write_templates():
     groups = OrderedDict()
     for r in csv.DictReader(TEMPLATE_CSV.open(encoding="utf-8")):
+        normalize_obligations(r)
         groups.setdefault((r["Template ID"], r["DICOM TID Name"]), []).append(r)
     cols = ["Row No", "NL", "REL with Parent", "VT", "Concept Name", "VM", "Req Type (DICOM)", "Req Type (IHE)", "Consumer Obligation", "Producer Obligation"]
     widths = ["6%", "5%", "13%", "6%", "22%", "5%", "8%", "8%", "13.5%", "13.5%"]
-    for (tid, name), rows in groups.items():
-        d_url = rows[0]["DICOM Section URL"]
-        m_url = rows[0]["MADO Page URL"]
-        body = [f"#### TID {tid} {name}", ""]
-        intro = f"DICOM SR template TID {tid} ({name}) nodes with DICOM/IHE requirement types and EU-MADO Consumer/Producer obligations."
-        extra = TEMPLATE_INTRO_EXTRA.get(tid)
-        body.append(f"{intro} {extra}" if extra else intro)
-        body.append("")
-        body.append("<ul>")
-        if d_url:
-            body.append(f'  <li><strong>DICOM source:</strong> <a href="{d_url}" target="_blank">PS3.16 TID {tid}</a></li>')
-        body.append(f'  <li><strong>IHE-MADO:</strong> <a href="{m_url or MADO}" target="_blank">IHE RAD MADO supplement</a></li>')
-        body.append("</ul>")
-        body.append("")
-        body.append('<div class="table-wrap">')
-        body.append(f'  <table summary="TID {tid} {name}">')
-        body.append(f"    <caption>TID {tid} {name}</caption>")
-        body.append(colgroup(widths))
-        body.append("    <thead>")
-        body.append(th(cols))
-        body.append("    </thead>")
-        body.append("    <tbody>")
-        for r in rows:
-            body.append(td([r["Row No"], r["NL"], r["REL with Parent"], r["VT"], r["Concept Name"], r["VM"], r["Req Type (DICOM)"], r["Req Type (IHE)"], oblig_link(r["Consumer Obligation"]), oblig_link(r["Producer Obligation"])], left={4}, raw={8, 9}))
-        body.append("    </tbody>")
-        body.append("  </table>")
-        body.append("</div>")
-        body.append("")
-        (OUT / f"dicom-template-{tid}.md").write_text("\n".join(body), encoding="utf-8")
+    for (tid, name), all_rows in groups.items():
+        for variant in ("full", "lean"):
+            rows = all_rows if variant == "full" else [r for r in all_rows if r.get("Field State", "").strip() == "lean"]
+            d_url = all_rows[0]["DICOM Section URL"]
+            m_url = all_rows[0]["MADO Page URL"]
+            title_tid = tid if tid in {"1602-s", "1602-i"} else tid
+            title_name = {
+                "1602-s": "Image Library Entry Descriptors (series)",
+                "1602-i": "Image Library Entry Descriptors (instance)",
+            }.get(tid, name)
+            body = [f"#### TID {title_tid} {title_name}", ""]
+            intro = f"DICOM SR template TID {title_tid} ({title_name}) nodes with DICOM/IHE requirement types and EU-MADO Consumer/Producer obligations."
+            extra = TEMPLATE_INTRO_EXTRA.get(tid)
+            body.append(f"{intro} {extra}" if extra else intro)
+            body.append("")
+            body.append("<ul>")
+            if d_url:
+                body.append(f'  <li><strong>DICOM source:</strong> <a href="{d_url}" target="_blank">PS3.16 TID {title_tid}</a></li>')
+            body.append(f'  <li><strong>IHE-MADO:</strong> <a href="{m_url or MADO}" target="_blank">IHE RAD MADO supplement</a></li>')
+            body.append("</ul>")
+            body.append("")
+            body.append('<div class="table-wrap">')
+            body.append(f'  <table summary="TID {title_tid} {title_name}">')
+            body.append(f"    <caption>TID {title_tid} {title_name}</caption>")
+            body.append(colgroup(widths))
+            body.append("    <thead>")
+            body.append(th(cols))
+            body.append("    </thead>")
+            body.append("    <tbody>")
+            for r in rows:
+                body.append(td([r["Row No"], r["NL"], r["REL with Parent"], r["VT"], r["Concept Name"], r["VM"], r["Req Type (DICOM)"], r["Req Type (IHE)"], oblig_link(r["Consumer Obligation"]), oblig_link(r["Producer Obligation"])], left={4}, raw={8, 9}))
+            body.append("    </tbody>")
+            body.append("  </table>")
+            body.append("</div>")
+            body.append("")
+            prefix = "dicom-kos-template-1602-i" if tid == "1602-i" else "dicom-template-1602-s" if tid == "1602-s" else f"dicom-template-{tid}"
+            (OUT / f"{prefix}-{variant}.md").write_text("\n".join(body), encoding="utf-8")
     return list(groups)
 
 

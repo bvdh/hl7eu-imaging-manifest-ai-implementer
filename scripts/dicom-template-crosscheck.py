@@ -15,7 +15,7 @@ Output columns:
   Concept Name, VM, Req Type (DICOM), Req Type (IHE),
   Condition (DICOM), Condition (IHE), ValueSet (DICOM), ValueSet (IHE),
   in_dicom, in_ihe_mado, difference_type,
-  DICOM Section URL, MADO Page URL, DICOM Difference Note
+    DICOM Section URL, MADO Page URL, DICOM Difference Note, TID 1602 Context
 
 difference_type values:
   both          – node present in both PS3.16 and IHE-MADO, same requirement
@@ -60,7 +60,7 @@ OUTPUT_COLS = [
     "Concept Name", "VM", "Req Type (DICOM)", "Req Type (IHE)",
     "Condition (DICOM)", "Condition (IHE)", "ValueSet (DICOM)", "ValueSet (IHE)",
     "in_dicom", "in_ihe_mado", "difference_type",
-    "DICOM Section URL", "MADO Page URL", "DICOM Difference Note",
+    "DICOM Section URL", "MADO Page URL", "DICOM Difference Note", "TID 1602 Context", "Field State",
 ]
 
 
@@ -202,6 +202,11 @@ def _diff_type(df: Optional[Dict], mf: Optional[Dict]) -> str:
 
 def crosscheck(tid: Dict, dicom_rows: List[Dict], mado_rows: List[Dict]) -> List[Dict]:
     section_url = (P16_BASE + tid["page"] + "#" + tid["anchor"]) if tid["page"] else ""
+
+    def state(row: Dict) -> str:
+        if tid["tid"] == "16XX":
+            return "ignore"
+        return "lean" if (row.get("Req Type (IHE)") or "").strip() else "full"
     mado_by_no = {r.get("No", "").strip(): r for r in mado_rows if r.get("No", "").strip()}
     mado_by_concept = {_norm_concept(r.get("Concept Name", "")): r for r in mado_rows}
     consumed = set()
@@ -211,6 +216,7 @@ def crosscheck(tid: Dict, dicom_rows: List[Dict], mado_rows: List[Dict]) -> List
         m = mado_by_no.get(d["no"]) or mado_by_concept.get(_norm_concept(d["concept"]))
         if m:
             consumed.add(m.get("No", "").strip())
+        context = "1602-s;1602-i" if tid["tid"] == "1602" and (m or {}).get("Req Type (IHE)", "").strip() else ""
         out.append({
             "Template ID": tid["tid"], "DICOM TID Name": tid["name"], "Row No": d["no"],
             "NL": d["nl"], "REL with Parent": d["rel"], "VT": d["vt"],
@@ -223,11 +229,14 @@ def crosscheck(tid: Dict, dicom_rows: List[Dict], mado_rows: List[Dict]) -> List
             "difference_type": _diff_type(d, m), "DICOM Section URL": section_url,
             "MADO Page URL": (m or {}).get("MADO Page URL", ""),
             "DICOM Difference Note": (m or {}).get("DICOM Difference Note", ""),
+            "TID 1602 Context": context,
+            "Field State": state({"Req Type (IHE)": (m or {}).get("Req Type (IHE)", "")}),
         })
 
     for m in mado_rows:
         if m.get("No", "").strip() in consumed:
             continue
+        context = "1602-s;1602-i" if tid["tid"] == "1602" and m.get("Req Type (IHE)", "").strip() else ""
         out.append({
             "Template ID": tid["tid"], "DICOM TID Name": tid["name"], "Row No": m.get("No", ""),
             "NL": m.get("NL", ""), "REL with Parent": m.get("REL with Parent", ""), "VT": m.get("VT", ""),
@@ -238,6 +247,8 @@ def crosscheck(tid: Dict, dicom_rows: List[Dict], mado_rows: List[Dict]) -> List
             "in_dicom": "", "in_ihe_mado": "Y", "difference_type": "mado_only",
             "DICOM Section URL": section_url, "MADO Page URL": m.get("MADO Page URL", ""),
             "DICOM Difference Note": m.get("DICOM Difference Note", ""),
+            "TID 1602 Context": context,
+            "Field State": state(m),
         })
     return out
 
