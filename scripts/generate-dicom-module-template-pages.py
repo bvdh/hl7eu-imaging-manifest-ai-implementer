@@ -137,12 +137,23 @@ def write_templates():
     groups = OrderedDict()
     for r in csv.DictReader(TEMPLATE_CSV.open(encoding="utf-8")):
         normalize_obligations(r)
-        groups.setdefault((r["Template ID"], r["DICOM TID Name"]), []).append(r)
+        tid = r["Template ID"].strip()
+        if tid == "16XX":
+            continue
+        if tid == "1602":
+            contexts = [x.strip() for x in r.get("TID 1602 Context", "").split(";") if x.strip()]
+            for split_tid in ("1602-s", "1602-i"):
+                split_row = dict(r)
+                split_row["Template ID"] = split_tid
+                split_row["TID 1602 Context"] = split_tid if split_tid in contexts else ""
+                groups.setdefault((split_tid, r["DICOM TID Name"]), []).append(split_row)
+            continue
+        groups.setdefault((tid, r["DICOM TID Name"]), []).append(r)
     cols = ["Row No", "NL", "REL with Parent", "VT", "Concept Name", "VM", "Req Type (DICOM)", "Req Type (IHE)", "Consumer Obligation", "Producer Obligation"]
     widths = ["6%", "5%", "13%", "6%", "22%", "5%", "8%", "8%", "13.5%", "13.5%"]
     for (tid, name), all_rows in groups.items():
         for variant in ("full", "lean"):
-            rows = all_rows if variant == "full" else [r for r in all_rows if r.get("Field State", "").strip() == "lean"]
+            rows = all_rows if variant == "full" else [r for r in all_rows if r.get("Field State", "").strip() == "lean" and (tid not in {"1602-s", "1602-i"} or r.get("TID 1602 Context", "").strip() == tid)]
             d_url = all_rows[0]["DICOM Section URL"]
             m_url = all_rows[0]["MADO Page URL"]
             title_tid = tid if tid in {"1602-s", "1602-i"} else tid

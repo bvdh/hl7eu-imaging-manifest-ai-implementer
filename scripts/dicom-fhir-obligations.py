@@ -210,9 +210,6 @@ def enrich_templates(by_code):
             hits += 1
         row = {**r, **merge(e)}
         row = apply_ihe_usage_obligations(row)
-        if not row.get(TID_CONTEXT_COL):
-            has_obligation = bool((row.get("Consumer Obligation") or "").strip() or (row.get("Producer Obligation") or "").strip())
-            row[TID_CONTEXT_COL] = "1602-s;1602-i" if row.get("Template ID") == "1602" and has_obligation else ""
         row[FIELD_STATE_COL] = field_state(row, "Req Type (IHE)")
         out.append(row)
     write(TEMPLATE_OUT, cols, out)

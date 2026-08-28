@@ -52,7 +52,7 @@ TID_CATALOGUE: List[Dict] = [
     {"tid": "1600", "name": "Image Library", "page": "chapter_A.html", "anchor": "table_TID_1600", "mado_ids": ["1600"]},
     {"tid": "1601", "name": "Image Library Entry", "page": "chapter_A.html", "anchor": "table_TID_1601", "mado_ids": []},
     {"tid": "1602", "name": "Image Library Entry Descriptors", "page": "chapter_A.html", "anchor": "table_TID_1602", "mado_ids": ["1602"]},
-    {"tid": "16XX", "name": "Image Library Entry Descriptors for Key Object Selection", "page": None, "anchor": None, "mado_ids": ["16XX"]},
+    {"tid": "1609", "name": "Image Library Entry Descriptors for Key Object Selection", "page": "chapter_A.html", "anchor": "table_TID_1609", "mado_ids": ["16XX"]},
 ]
 
 OUTPUT_COLS = [
@@ -190,6 +190,9 @@ def _norm_concept(s: str) -> str:
 _REQUIRED_DICOM = {"M", "MC"}
 _REQUIRED_MADO = {"R", "R+", "RC", "RC+"}
 
+TID_1602_SERIES_ROWS = {"1", "2", "2b", "3", "4", "5", "5a", "5b", "5c", "5d", "5e", "5f", "5g", "18"}
+TID_1602_INSTANCE_ROWS = {"2b", "12a", "12b"}
+
 
 def _diff_type(df: Optional[Dict], mf: Optional[Dict]) -> str:
     in_d, in_m = bool(df), bool(mf)
@@ -216,7 +219,7 @@ def crosscheck(tid: Dict, dicom_rows: List[Dict], mado_rows: List[Dict]) -> List
         m = mado_by_no.get(d["no"]) or mado_by_concept.get(_norm_concept(d["concept"]))
         if m:
             consumed.add(m.get("No", "").strip())
-        context = "1602-s;1602-i" if tid["tid"] == "1602" and (m or {}).get("Req Type (IHE)", "").strip() else ""
+        context = tid_1602_context(tid["tid"], d["no"], bool(m))
         out.append({
             "Template ID": tid["tid"], "DICOM TID Name": tid["name"], "Row No": d["no"],
             "NL": d["nl"], "REL with Parent": d["rel"], "VT": d["vt"],
@@ -236,7 +239,7 @@ def crosscheck(tid: Dict, dicom_rows: List[Dict], mado_rows: List[Dict]) -> List
     for m in mado_rows:
         if m.get("No", "").strip() in consumed:
             continue
-        context = "1602-s;1602-i" if tid["tid"] == "1602" and m.get("Req Type (IHE)", "").strip() else ""
+        context = tid_1602_context(tid["tid"], m.get("No", "").strip(), True)
         out.append({
             "Template ID": tid["tid"], "DICOM TID Name": tid["name"], "Row No": m.get("No", ""),
             "NL": m.get("NL", ""), "REL with Parent": m.get("REL with Parent", ""), "VT": m.get("VT", ""),
@@ -251,6 +254,17 @@ def crosscheck(tid: Dict, dicom_rows: List[Dict], mado_rows: List[Dict]) -> List
             "Field State": state(m),
         })
     return out
+
+
+def tid_1602_context(tid: str, row_no: str, has_mado_usage: bool) -> str:
+    if tid != "1602" or not has_mado_usage:
+        return ""
+    contexts = []
+    if row_no in TID_1602_SERIES_ROWS:
+        contexts.append("1602-s")
+    if row_no in TID_1602_INSTANCE_ROWS:
+        contexts.append("1602-i")
+    return ";".join(contexts)
 
 
 def main() -> None:
