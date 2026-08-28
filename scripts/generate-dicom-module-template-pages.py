@@ -97,7 +97,7 @@ def write_modules():
     for r in csv.DictReader(MODULE_CSV.open(encoding="utf-8")):
         normalize_obligations(r)
         groups.setdefault(r["Module"], []).append(r)
-    cols = ["Attribute Name", "Tag", "DICOM Type", "IHE Usage", "Consumer Obligation", "Producer Obligation"]
+    cols = ["Attribute Name", "Tag", "DICOM Type", "IHE Usage", "Document Consumer Obligation", "Content Creator/Document Source Obligation"]
     widths = ["26%", "9%", "8%", "9%", "24%", "24%"]
     for module, all_rows in groups.items():
         for variant in ("full", "lean"):
@@ -149,7 +149,7 @@ def write_templates():
                 groups.setdefault((split_tid, r["DICOM TID Name"]), []).append(split_row)
             continue
         groups.setdefault((tid, r["DICOM TID Name"]), []).append(r)
-    cols = ["Row No", "NL", "REL with Parent", "VT", "Concept Name", "VM", "Req Type (DICOM)", "Req Type (IHE)", "Consumer Obligation", "Producer Obligation"]
+    cols = ["Row No", "NL", "REL with Parent", "VT", "Concept Name", "VM", "Req Type (DICOM)", "Req Type (IHE)", "Document Consumer Obligation", "Content Creator/Document Source Obligation"]
     widths = ["6%", "5%", "13%", "6%", "22%", "5%", "8%", "8%", "13.5%", "13.5%"]
     for (tid, name), all_rows in groups.items():
         for variant in ("full", "lean"):

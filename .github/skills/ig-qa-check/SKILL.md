@@ -1,7 +1,7 @@
 ---
 name: ig-qa-check
 description: "Validate a FHIR Implementation Guide for profile-reference correctness and publisher quality. Use when checking [[[profile]]] links, direct profile references, MADO/MHD references, Jekyll aliases, rendered hyperlinks, broken links, SUSHI output, or IG QA before release."
-argument-hint: "IG path and scope, e.g. imaging-manifest-fork profile links"
+Run a focused quality check for a FHIR Implementation Guide, with special attention to references to profiles and other named FHIR artifacts. The check covers source content, FSH descriptions, Jekyll aliases, generated links, publisher QA output, and example coverage for local profiles and named slices.
 ---
 
 # IG QA Check
@@ -21,7 +21,9 @@ The skill's persistent memory of known specification URLs is maintained in [spec
 - Validate MADO or MHD profile references in narrative pages and FSH descriptions.
 - Check that references to specifications declared in `sushi-config.yaml` use the correct dependency version, including build URLs for `dev` and `build` dependencies.
 - Confirm that generated StructureDefinition descriptions do not retain unresolved profile tokens.
-- Run a pre-release FHIR IG QA pass after narrative, profile, dependency, or link changes.
+- Audit example coverage for local profiles and named slices.
+- Check that every FHIR element carrying an obligation is marked Must Support.
+- Run a pre-release FHIR IG QA pass after narrative, profile, dependency, example, or link changes.
 
 ## Scope Rules
 
@@ -109,6 +111,35 @@ It may also import `variable-definitions.md` for Jekyll aliases. Confirm that:
 - FSH descriptions do not rely on page-only Jekyll includes. Use explicit Markdown links in FSH descriptions when those descriptions are serialized into generated resources.
 - Direct named profile references are linkified only when they identify a specific artifact, not when they are generic resource prose or query syntax.
 
+### 1a. Check obligation and Must Support consistency
+
+Audit every local generated `StructureDefinition` for FHIR elements that carry an obligation extension. This includes producer and consumer obligations and applies to obligations introduced by the local differential or inherited into the generated snapshot.
+
+Use the generated JSON as the authoritative structural representation after SUSHI has run:
+
+```sh
+find output -maxdepth 1 -name 'StructureDefinition-*.json' -print
+rg -n 'http://hl7.org/fhir/StructureDefinition/obligation|"mustSupport"' output/StructureDefinition-*.json
+```
+
+For each obligation-bearing element:
+
+1. Identify the exact `ElementDefinition.id`, including slice names and nested paths.
+2. Locate the same element in the generated `snapshot.element` array. Use the differential only to identify the local source of the constraint; do not infer the final Must Support state from differential omission.
+3. Require `mustSupport: true` on that exact element. A Must Support flag on a parent, unsliced element, or similarly named slice does not satisfy the check.
+4. Check both obligation codes when both producer and consumer obligations are present. The number of obligations does not change the single Must Support requirement.
+5. Trace failures back to the owning FSH rule or insert, and report the profile, element id, obligation code(s), source file, and generated artifact.
+
+Do not treat an obligation on a non-element metadata object as an element-level requirement unless it is attached to an `ElementDefinition`. Do not hand-edit generated JSON to fix a failure. Report dependency-only failures separately when the obligation originates in an external parent profile and cannot be changed locally.
+
+Report the audit in a table:
+
+| Profile | Element id | Obligation code(s) | Must Support | Source / generated evidence | Result |
+|---|---|---|---|---|---|
+| `StructureDefinition-id` | `Resource.element[slice]` | `SHALL:populate` | `true` or `false` | FSH path and JSON path | `Pass` or `Fail` |
+
+The check fails if any locally authored obligation-bearing element has `mustSupport` absent or set to `false`. Summarize the total number checked, passed, and failed. This audit is independent of example coverage: an example may exercise an element, but it cannot substitute for the profile's Must Support flag.
+
 ### 2. Check spelling and grammar
 
 Review all in-scope Markdown, FSH descriptions, and newly edited link text for spelling and grammar errors. Preserve FHIR, MADO, MHD, DICOM, Xt-EHR, profile ids, URLs, code, query examples, and other domain-specific identifiers exactly as written.
@@ -123,7 +154,29 @@ Check for:
 
 Use an available spellchecker or linter when present, but manually review domain terms and every proposed correction. Do not treat unknown FHIR or IHE identifiers as spelling errors. Keep editorial corrections separate from link and structural changes so they can be reviewed clearly.
 
-### 3. Apply the smallest source changes
+### 3. Check work-note validity
+
+When the guide contains a work note, meeting note, issue list, or implementation checklist, audit every actionable item against the current authoritative source and build state. Do not assume that an item is still open because it appears in the note, and do not assume it is complete because the IG builds.
+
+1. Enumerate each distinct request, proposed wording change, technical change, and follow-up in the note. Split compound bullets into separate checks when they can have different outcomes.
+2. Locate the owning source for each item in `input/`, `sushi-config.yaml`, scripts, or the resolved dependency package.
+3. Check the current implementation and, where relevant, the generated artifact or publisher QA result.
+4. Classify each item as one of:
+	- `Completed`: implemented and supported by current source/build evidence.
+	- `Still required`: not implemented and still applicable.
+	- `Partially completed`: some requested aspects are implemented, but a remaining aspect is open.
+	- `No longer applicable`: superseded by a newer specification, dependency, design, or decision.
+	- `Blocked`: still applicable, but verification or implementation depends on an unavailable external change.
+	- `Needs decision`: the note is ambiguous or requires an explicit product/specification decision.
+5. Report every item in a table. The `Work-note file` column must identify the exact note or checklist file containing the item, using a workspace-relative path when possible:
+
+| Work-note file | Work-note item | Current evidence | Status | Remaining action or rationale |
+|---|---|---|---|
+| `doc/2026-08-27-meeting-note.md` | Exact short description | Source path, generated artifact, build output, or dependency evidence | One classification above | What remains, or why it is complete/outdated |
+
+6. For completed items, cite the current source or generated evidence. For open items, identify the smallest owning change. For no-longer-applicable items, state what superseded them. If an item is derived from multiple notes, list each relevant work-note file. Do not edit the work note as part of this audit unless the user explicitly requests note maintenance.
+
+### 4. Apply the smallest source changes
 
 Keep changes limited to the owning source files:
 
@@ -133,7 +186,7 @@ Keep changes limited to the owning source files:
 - Reuse existing aliases and link templates before adding new definitions.
 - Do not hand-edit generated link-reference files or generated HTML.
 
-### 4. Run focused checks
+### 5. Run focused checks
 
 From the repository root, run the source checker if its path assumptions match the workspace:
 
@@ -153,7 +206,7 @@ rg -n '\[\[\[' input/pagecontent input/fsh
 
 The final `rg` should return no unresolved tokens unless a specific token is intentionally retained and documented.
 
-### 5. Build the IG
+### 6. Build the IG
 
 Run the supported build from inside the guide root:
 
@@ -169,7 +222,7 @@ Confirm these files are regenerated:
 - `output/qa-time-report.json`
 - `output/qa-time-report.tsv`
 
-### 6. Validate rendered profile links
+### 7. Validate rendered profile links
 
 After a fresh build, run:
 
@@ -192,7 +245,7 @@ rg -n '\[\[\[|\{\{[^}]+\}\}' output/en
 rg -n 'StructureDefinition-|ActorDefinition-|CapabilityStatement-' output/en/<affected-page>.html output/en/StructureDefinition-*.html
 ```
 
-### 7. Report QA results
+### 8. Report QA results
 
 Read the summary fields from `output/qa.json`:
 
@@ -208,6 +261,8 @@ Report errors first. Distinguish pre-existing warnings from warnings introduced 
 The check is complete when:
 
 - All named profile, actor, and capability references in scope have an authoritative target.
+- Every actionable work-note item in scope has been checked against current source and classified with evidence.
+- Every locally authored obligation-bearing FHIR element has been checked in the generated snapshot and is marked `mustSupport: true`, or any dependency-only exception is reported explicitly.
 - Every reference to a dependency specification matches the version configured in `sushi-config.yaml`; `dev` and `build` dependencies use the corresponding `build.fhir.org` URL.
 - The skill memory in [spec-locations.md](./references/spec-locations.md) records the verified locations used by the check, including any newly discovered or corrected mappings.
 - Local triple-bracket references resolve through the generated link-reference mechanism.
