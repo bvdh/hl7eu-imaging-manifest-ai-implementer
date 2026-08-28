@@ -26,8 +26,8 @@ Study series.instancesInTheSeries.instanceNumber,MadoImagingStudy.series.instanc
 Study series.instancesInTheSeries.numberOfFrames,MadoImagingStudy.series.instance.extension[number-of-frames],MadoImagingStudy.series.instance.extension[number-of-frames],"SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"") -> Image Library Entry (IMAGE) -> EV (121140, DCM, ""Number of Frames"")",,
 Study series.instancesInTheSeries.koDocumentTitle,MadoImagingStudy.series.instance.extension[ko-document-title],MadoImagingStudy.series.instance.extension[ko-document-title],"SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"") -> Image Library Entry (COMPOSITE) EV (121144, DCM, ""Document Title"")",,
 Study series.instancesInTheSeries.koDescription,MadoImagingStudy.series.instance.title,MadoImagingStudy.series.instance.title,"SR: EV(111028,DCM,""Image Library"") -> EV(126200,DCM,""Image Library Group"") -> Image Library Entry (COMPOSITE) EV (113012, DCM, "" Key Object Description "" )",,
-Patient Name,MadoImagingStudy.subject->MadoPatient.name,MadoPatient.name,"Patient Name (0010,0010)",,
-Patient ID,MadoImagingStudy.subject->MadoPatient.identifier,MadoPatient.identifier,"Patient ID (0010,0020) & Type of Patient ID (0010,0022) & Issuer of Patient ID Qualifiers Sequence (0010,0026)",,
+Patient Name,MadoImagingStudy.subject->MadoPatient.name,MadoPatient.name,"Patient Name (0010,0010)",EuMadoPatient.name,Added from XtEHR mapping
+Patient ID,MadoImagingStudy.subject->MadoPatient.identifier,MadoPatient.identifier,"Patient ID (0010,0020) & Type of Patient ID (0010,0022) & Issuer of Patient ID Qualifiers Sequence (0010,0026)",EuMadoPatient.identifier,Added from XtEHR mapping
 Patient Birthdate,MadoImagingStudy.subject->MadoPatient.birthDate,MadoPatient.birthDate,"Patient Birth Date (0010,0030)",,
 Patient Sex,MadoImagingStudy.subject->MadoPatient.gender,MadoPatient.gender,"Patient Sex (0010,0040)",,
 RequestedProcedure Accession Number,"MadoImagingStudy.basedOn[order].identifier

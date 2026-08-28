@@ -3,9 +3,9 @@ EuMadoBundle,id,,MadoFhirBundle.id,,,
 EuMadoBundle,meta,,MadoFhirBundle.meta,,,
 EuMadoBundle,implicitRules,,MadoFhirBundle.implicitRules,,,
 EuMadoBundle,language,,MadoFhirBundle.language,,,
-EuMadoBundle,identifier,MS,MadoFhirBundle.identifier,,SHALL:populate,Required by MADO
+EuMadoBundle,identifier,MS,MadoFhirBundle.identifier,,,Required by MADO
 EuMadoBundle,type,,MadoFhirBundle.type,,,
-EuMadoBundle,timestamp,MS,MadoFhirBundle.timestamp,,SHALL:populate,Required by MADO
+EuMadoBundle,timestamp,MS,MadoFhirBundle.timestamp,,,Required by MADO
 EuMadoBundle,total,,MadoFhirBundle.total,,,
 EuMadoBundle,link,,MadoFhirBundle.link,,,
 EuMadoBundle,link.id,,MadoFhirBundle.link.id,,,
@@ -45,20 +45,20 @@ EuMadoBundle,entry.response.location,,MadoFhirBundle.entry.response.location,,,
 EuMadoBundle,entry.response.etag,,MadoFhirBundle.entry.response.etag,,,
 EuMadoBundle,entry.response.lastModified,,MadoFhirBundle.entry.response.lastModified,,,
 EuMadoBundle,entry.response.outcome,,MadoFhirBundle.entry.response.outcome,,,
-EuMadoBundle,entry[composition],MS,MadoFhirBundle.entry[composition],,SHALL:populate,Required by MADO
-EuMadoBundle,entry[imaging-study],MS,MadoFhirBundle.entry[imaging-study],,SHALL:populate,Required by MADO
-EuMadoBundle,entry[patient],MS,MadoFhirBundle.entry[patient],,SHALL:populate,Required by MADO
-EuMadoBundle,entry[wado-endpoint],MS,MadoFhirBundle.entry[wado-endpoint],,SHALL:populate-if-known,Required by MADO
-EuMadoBundle,entry[web-endpoint],MS,MadoFhirBundle.entry[web-endpoint],,SHALL:populate-if-known,Required by MADO
-EuMadoBundle,entry[creator],MS,MadoFhirBundle.entry[creator],,SHALL:populate,Required by MADO
-EuMadoBundle,entry[creator-organization],MS,MadoFhirBundle.entry[creator-organization],,SHALL:populate,Required by MADO
-EuMadoBundle,entry[requested-procedure],MS,MadoFhirBundle.entry[requested-procedure],,SHALL:able-to-populate,Required by MADO.
+EuMadoBundle,entry[composition],MS,MadoFhirBundle.entry[composition],,,Required by MADO
+EuMadoBundle,entry[imaging-study],MS,MadoFhirBundle.entry[imaging-study],,,Required by MADO
+EuMadoBundle,entry[patient],MS,MadoFhirBundle.entry[patient],,,Required by MADO
+EuMadoBundle,entry[wado-endpoint],MS,MadoFhirBundle.entry[wado-endpoint],,,Required by MADO
+EuMadoBundle,entry[web-endpoint],MS,MadoFhirBundle.entry[web-endpoint],,,Required by MADO
+EuMadoBundle,entry[creator-device],MS,MadoFhirBundle.entry[creator-device],,,Required by MADO
+EuMadoBundle,entry[creator-organization],MS,MadoFhirBundle.entry[creator-organization],,,Required by MADO
+EuMadoBundle,entry[requested-procedure],MS,MadoFhirBundle.entry[requested-procedure],,,Required by MADO.
 EuMadoBundle,signature,,MadoFhirBundle.signature,,,
 EuMadoComposition,id,,MadoComposition.id,,,
 EuMadoComposition,meta,,MadoComposition.meta,,,
 EuMadoComposition,implicitRules,,MadoComposition.implicitRules,,,
-EuMadoComposition,language,MS,MadoComposition.language,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.language
-EuMadoComposition,text,MS,MadoComposition.text,,SHALL:populate,From MADO
+EuMadoComposition,language,MS,MadoComposition.language,,,EHDSImagingStudy.language
+EuMadoComposition,text,MS,MadoComposition.text,,,From IHE-MADO
 EuMadoComposition,text.id,,MadoComposition.text.id,,,
 EuMadoComposition,text.extension,,MadoComposition.text.extension,,,
 EuMadoComposition,text.status,,MadoComposition.text.status,,,
@@ -66,17 +66,17 @@ EuMadoComposition,text.div,,MadoComposition.text.div,,,
 EuMadoComposition,contained,,MadoComposition.contained,,,
 EuMadoComposition,extension,,MadoComposition.extension,,,
 EuMadoComposition,modifierExtension,,MadoComposition.modifierExtension,,,
-EuMadoComposition,identifier,MS,MadoComposition.identifier,,SHALL:populate,From MADO
-EuMadoComposition,status,MS,MadoComposition.status,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.status
-EuMadoComposition,type,MS,MadoComposition.type,,SHALL:able-to-populate,From MADO
-EuMadoComposition,category,MS,MadoComposition.category,,SHOULD:able-to-populate,From MADO
-EuMadoComposition,subject,MS,MadoComposition.subject,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.subject
+EuMadoComposition,identifier,MS,MadoComposition.identifier,,,From IHE-MADO
+EuMadoComposition,status,MS,MadoComposition.status,,,EHDSImagingStudy.status
+EuMadoComposition,type,MS,MadoComposition.type,,,From IHE-MADO
+EuMadoComposition,category,MS,MadoComposition.category,,,From IHE-MADO
+EuMadoComposition,subject,MS,MadoComposition.subject,,,EHDSImagingStudy.subject
 EuMadoComposition,encounter,,MadoComposition.encounter,,,
-EuMadoComposition,date,MS,MadoComposition.date,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.date
+EuMadoComposition,date,MS,MadoComposition.date,,,EHDSImagingStudy.date
 EuMadoComposition,author,,MadoComposition.author,,,
-EuMadoComposition,author[source-organization],MS,MadoComposition.author[source-organization],SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.author[EHDSOrganization]
-EuMadoComposition,author[source-device],MS,MadoComposition.author[source-device],SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.author[EHDSDevice]
-EuMadoComposition,title,MS,MadoComposition.title,,SHALL:populate,From MADO
+EuMadoComposition,author[source-organization],MS,MadoComposition.author[source-organization],,,EHDSImagingStudy.author[EHDSOrganization]
+EuMadoComposition,author[source-device],MS,MadoComposition.author[source-device],,,EHDSImagingStudy.author[EHDSDevice]
+EuMadoComposition,title,MS,MadoComposition.title,,,From IHE-MADO
 EuMadoComposition,confidentiality,,MadoComposition.confidentiality,,,
 EuMadoComposition,attester,,MadoComposition.attester,,,
 EuMadoComposition,attester.id,,MadoComposition.attester.id,,,
@@ -85,7 +85,7 @@ EuMadoComposition,attester.modifierExtension,,MadoComposition.attester.modifierE
 EuMadoComposition,attester.mode,,MadoComposition.attester.mode,,,
 EuMadoComposition,attester.time,,MadoComposition.attester.time,,,
 EuMadoComposition,attester.party,,MadoComposition.attester.party,,,
-EuMadoComposition,custodian,MS,MadoComposition.custodian,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.custodian
+EuMadoComposition,custodian,MS,MadoComposition.custodian,,,EHDSImagingStudy.custodian
 EuMadoComposition,relatesTo,,MadoComposition.relatesTo,,,
 EuMadoComposition,relatesTo.id,,MadoComposition.relatesTo.id,,,
 EuMadoComposition,relatesTo.extension,,MadoComposition.relatesTo.extension,,,
@@ -99,8 +99,8 @@ EuMadoComposition,event.modifierExtension,,MadoComposition.event.modifierExtensi
 EuMadoComposition,event.code,,MadoComposition.event.code,,,
 EuMadoComposition,event.period,,MadoComposition.event.period,,,
 EuMadoComposition,event.detail,,MadoComposition.event.detail,,,
-EuMadoComposition,event[imaging-study],MS,MadoComposition.event[imaging-study],,SHALL:populate,From MADO
-EuMadoComposition,section,MS,MadoComposition.section,,MAY:able-to-populate,From MADO
+EuMadoComposition,event[imaging-study],MS,MadoComposition.event[imaging-study],,,From IHE-MADO
+EuMadoComposition,section,MS,MadoComposition.section,,,From IHE-MADO
 EuMadoComposition,section.id,,MadoComposition.section.id,,,
 EuMadoComposition,section.extension,,MadoComposition.section.extension,,,
 EuMadoComposition,section.modifierExtension,,MadoComposition.section.modifierExtension,,,
@@ -108,7 +108,7 @@ EuMadoComposition,section.title,,MadoComposition.section.title,,,
 EuMadoComposition,section.code,,MadoComposition.section.code,,,
 EuMadoComposition,section.author,,MadoComposition.section.author,,,
 EuMadoComposition,section.focus,,MadoComposition.section.focus,,,
-EuMadoComposition,section.text,MS,MadoComposition.section.text,,SHALL:populate,From MADO
+EuMadoComposition,section.text,MS,MadoComposition.section.text,,,From IHE-MADO
 EuMadoComposition,section.text.id,,MadoComposition.section.text.id,,,
 EuMadoComposition,section.text.extension,,MadoComposition.section.text.extension,,,
 EuMadoComposition,section.text.status,,MadoComposition.section.text.status,,,
@@ -141,7 +141,7 @@ EuMadoCreator,udiCarrier.entryType,,MadoCreator.udiCarrier.entryType,,,
 EuMadoCreator,status,,MadoCreator.status,,,
 EuMadoCreator,statusReason,,MadoCreator.statusReason,,,
 EuMadoCreator,distinctIdentifier,,MadoCreator.distinctIdentifier,,,
-EuMadoCreator,manufacturer,MS,MadoCreator.manufacturer,,SHALL:able-to-populate,Required by MADO
+EuMadoCreator,manufacturer,MS,MadoCreator.manufacturer,,,Required by MADO
 EuMadoCreator,manufactureDate,,MadoCreator.manufactureDate,,,
 EuMadoCreator,expirationDate,,MadoCreator.expirationDate,,,
 EuMadoCreator,lotNumber,,MadoCreator.lotNumber,,,
@@ -154,7 +154,7 @@ EuMadoCreator,deviceName.name,,MadoCreator.deviceName.name,,,
 EuMadoCreator,deviceName.type,,MadoCreator.deviceName.type,,,
 EuMadoCreator,modelNumber,,MadoCreator.modelNumber,,,
 EuMadoCreator,partNumber,,MadoCreator.partNumber,,,
-EuMadoCreator,type,MS,MadoCreator.type,,SHALL:able-to-populate,Required by MADO
+EuMadoCreator,type,MS,MadoCreator.type,,,Required by MADO
 EuMadoCreator,type.id,,MadoCreator.type.id,,,
 EuMadoCreator,type.extension,,MadoCreator.type.extension,,,
 EuMadoCreator,type.coding,,MadoCreator.type.coding,,,
@@ -187,7 +187,7 @@ EuMadoCreator,property.type,,MadoCreator.property.type,,,
 EuMadoCreator,property.valueQuantity,,MadoCreator.property.valueQuantity,,,
 EuMadoCreator,property.valueCode,,MadoCreator.property.valueCode,,,
 EuMadoCreator,patient,,MadoCreator.patient,,,
-EuMadoCreator,owner,MS,MadoCreator.owner,,SHALL:able-to-populate,Required by MADO
+EuMadoCreator,owner,MS,MadoCreator.owner,,,Required by MADO
 EuMadoCreator,contact,,MadoCreator.contact,,,
 EuMadoCreator,location,,MadoCreator.location,,,
 EuMadoCreator,url,,MadoCreator.url,,,
@@ -202,10 +202,10 @@ EuMadoCreatorOrganization,text,,MadoCreatorOrganization.text,,,
 EuMadoCreatorOrganization,contained,,MadoCreatorOrganization.contained,,,
 EuMadoCreatorOrganization,extension,,MadoCreatorOrganization.extension,,,
 EuMadoCreatorOrganization,modifierExtension,,MadoCreatorOrganization.modifierExtension,,,
-EuMadoCreatorOrganization,identifier,MS,MadoCreatorOrganization.identifier,,SHALL:able-to-populate,Required by MADO
+EuMadoCreatorOrganization,identifier,MS,MadoCreatorOrganization.identifier,,,Required by MADO
 EuMadoCreatorOrganization,active,,MadoCreatorOrganization.active,,,
-EuMadoCreatorOrganization,type,MS,MadoCreatorOrganization.type,,SHALL:able-to-populate,Required by MADO
-EuMadoCreatorOrganization,name,MS,MadoCreatorOrganization.name,,SHALL:able-to-populate,Required by MADO
+EuMadoCreatorOrganization,type,,MadoCreatorOrganization.type,,,
+EuMadoCreatorOrganization,name,MS,MadoCreatorOrganization.name,,,Required by MADO
 EuMadoCreatorOrganization,alias,,MadoCreatorOrganization.alias,,,
 EuMadoCreatorOrganization,telecom,,MadoCreatorOrganization.telecom,,,
 EuMadoCreatorOrganization,address,,MadoCreatorOrganization.address,,,
@@ -234,43 +234,36 @@ EuMadoDicomKosDocumentReference,language,,MadoDicomKosDocumentReference.language
 EuMadoDicomKosDocumentReference,text,,MadoDicomKosDocumentReference.text,,,
 EuMadoDicomKosDocumentReference,contained,,MadoDicomKosDocumentReference.contained,,,
 EuMadoDicomKosDocumentReference,extension,,MadoDicomKosDocumentReference.extension,,,
-EuMadoDicomKosDocumentReference,extension[bodysite],MS,MadoDicomKosDocumentReference.extension[bodysite],,,
+EuMadoDicomKosDocumentReference,extension[bodysite],MS,MadoDicomKosDocumentReference.extension[bodysite],,,Required by MADO
 EuMadoDicomKosDocumentReference,extension.id,,MadoDicomKosDocumentReference.extension.id,,,
 EuMadoDicomKosDocumentReference,extension.extension,,MadoDicomKosDocumentReference.extension.extension,,,
-EuMadoDicomKosDocumentReference,extension.extension[concept],,MadoDicomKosDocumentReference.extension.extension[concept],,,
-EuMadoDicomKosDocumentReference,extension.extension.id,,MadoDicomKosDocumentReference.extension.extension.id,,,
-EuMadoDicomKosDocumentReference,extension.extension.extension,,MadoDicomKosDocumentReference.extension.extension.extension,,,
-EuMadoDicomKosDocumentReference,extension.extension.url,,MadoDicomKosDocumentReference.extension.extension.url,,,
-EuMadoDicomKosDocumentReference,extension.extension.value[x],,MadoDicomKosDocumentReference.extension.extension.value[x],,,
-EuMadoDicomKosDocumentReference,extension.extension[reference],,MadoDicomKosDocumentReference.extension.extension[reference],,,
-EuMadoDicomKosDocumentReference,extension.extension[_datatype],,MadoDicomKosDocumentReference.extension.extension[_datatype],,,
 EuMadoDicomKosDocumentReference,extension.url,,MadoDicomKosDocumentReference.extension.url,,,
 EuMadoDicomKosDocumentReference,extension.value[x],,MadoDicomKosDocumentReference.extension.value[x],,,
-EuMadoDicomKosDocumentReference,extension[modality],MS,MadoDicomKosDocumentReference.extension[modality],,,
+EuMadoDicomKosDocumentReference,extension[modality],MS,MadoDicomKosDocumentReference.extension[modality],,,Required by MADO
 EuMadoDicomKosDocumentReference,modifierExtension,,MadoDicomKosDocumentReference.modifierExtension,,,
 EuMadoDicomKosDocumentReference,masterIdentifier,,MadoDicomKosDocumentReference.masterIdentifier,,,
-EuMadoDicomKosDocumentReference,identifier,MS,MadoDicomKosDocumentReference.identifier,,,
-EuMadoDicomKosDocumentReference,identifier[entryUUID],MS,MadoDicomKosDocumentReference.identifier[entryUUID],,,
+EuMadoDicomKosDocumentReference,identifier,MS,MadoDicomKosDocumentReference.identifier,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,identifier[entryUUID],MS,MadoDicomKosDocumentReference.identifier[entryUUID],,,EU-MADO requirement
 EuMadoDicomKosDocumentReference,status,,MadoDicomKosDocumentReference.status,,,
 EuMadoDicomKosDocumentReference,docStatus,,MadoDicomKosDocumentReference.docStatus,,,
-EuMadoDicomKosDocumentReference,type,MS,MadoDicomKosDocumentReference.type,,,
-EuMadoDicomKosDocumentReference,category,MS,MadoDicomKosDocumentReference.category,,,
-EuMadoDicomKosDocumentReference,subject,MS,MadoDicomKosDocumentReference.subject,,,
-EuMadoDicomKosDocumentReference,date,MS,MadoDicomKosDocumentReference.date,,,
-EuMadoDicomKosDocumentReference,author,MS,MadoDicomKosDocumentReference.author,,,
-EuMadoDicomKosDocumentReference,author[source-organization],MS,MadoDicomKosDocumentReference.author[source-organization],,,
-EuMadoDicomKosDocumentReference,author[source-device],MS,MadoDicomKosDocumentReference.author[source-device],,,
+EuMadoDicomKosDocumentReference,type,MS,MadoDicomKosDocumentReference.type,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,category,MS,MadoDicomKosDocumentReference.category,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,subject,MS,MadoDicomKosDocumentReference.subject,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,date,MS,MadoDicomKosDocumentReference.date,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,author,MS,MadoDicomKosDocumentReference.author,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,author[source-organization],MS,MadoDicomKosDocumentReference.author[source-organization],,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,author[source-device],MS,MadoDicomKosDocumentReference.author[source-device],,,EU-MADO requirement
 EuMadoDicomKosDocumentReference,authenticator,,MadoDicomKosDocumentReference.authenticator,,,
 EuMadoDicomKosDocumentReference,custodian,,MadoDicomKosDocumentReference.custodian,,,
-EuMadoDicomKosDocumentReference,relatesTo,MS,MadoDicomKosDocumentReference.relatesTo,,,
+EuMadoDicomKosDocumentReference,relatesTo,MS,MadoDicomKosDocumentReference.relatesTo,,,EU-MADO requirement
 EuMadoDicomKosDocumentReference,relatesTo.id,,MadoDicomKosDocumentReference.relatesTo.id,,,
 EuMadoDicomKosDocumentReference,relatesTo.extension,,MadoDicomKosDocumentReference.relatesTo.extension,,,
 EuMadoDicomKosDocumentReference,relatesTo.modifierExtension,,MadoDicomKosDocumentReference.relatesTo.modifierExtension,,,
 EuMadoDicomKosDocumentReference,relatesTo.code,,MadoDicomKosDocumentReference.relatesTo.code,,,
 EuMadoDicomKosDocumentReference,relatesTo.target,,MadoDicomKosDocumentReference.relatesTo.target,,,
-EuMadoDicomKosDocumentReference,relatesTo[fhir-reference],MS,MadoDicomKosDocumentReference.relatesTo[fhir-reference],,,
+EuMadoDicomKosDocumentReference,relatesTo[fhir-reference],MS,MadoDicomKosDocumentReference.relatesTo[fhir-reference],,,EU-MADO requirement
 EuMadoDicomKosDocumentReference,description,,MadoDicomKosDocumentReference.description,,,
-EuMadoDicomKosDocumentReference,securityLabel,MS,MadoDicomKosDocumentReference.securityLabel,,,
+EuMadoDicomKosDocumentReference,securityLabel,MS,MadoDicomKosDocumentReference.securityLabel,,,EU-MADO requirement
 EuMadoDicomKosDocumentReference,content,,MadoDicomKosDocumentReference.content,,,
 EuMadoDicomKosDocumentReference,content.id,,MadoDicomKosDocumentReference.content.id,,,
 EuMadoDicomKosDocumentReference,content.extension,,MadoDicomKosDocumentReference.content.extension,,,
@@ -279,28 +272,28 @@ EuMadoDicomKosDocumentReference,content.attachment,,MadoDicomKosDocumentReferenc
 EuMadoDicomKosDocumentReference,content.attachment.id,,MadoDicomKosDocumentReference.content.attachment.id,,,
 EuMadoDicomKosDocumentReference,content.attachment.extension,,MadoDicomKosDocumentReference.content.attachment.extension,,,
 EuMadoDicomKosDocumentReference,content.attachment.contentType,,MadoDicomKosDocumentReference.content.attachment.contentType,,,
-EuMadoDicomKosDocumentReference,content.attachment.language,MS,MadoDicomKosDocumentReference.content.attachment.language,,,
+EuMadoDicomKosDocumentReference,content.attachment.language,MS,MadoDicomKosDocumentReference.content.attachment.language,,,EU-MADO requirement
 EuMadoDicomKosDocumentReference,content.attachment.data,,MadoDicomKosDocumentReference.content.attachment.data,,,
 EuMadoDicomKosDocumentReference,content.attachment.url,,MadoDicomKosDocumentReference.content.attachment.url,,,
 EuMadoDicomKosDocumentReference,content.attachment.size,,MadoDicomKosDocumentReference.content.attachment.size,,,
 EuMadoDicomKosDocumentReference,content.attachment.hash,,MadoDicomKosDocumentReference.content.attachment.hash,,,
 EuMadoDicomKosDocumentReference,content.attachment.title,,MadoDicomKosDocumentReference.content.attachment.title,,,
-EuMadoDicomKosDocumentReference,content.attachment.creation,MS,MadoDicomKosDocumentReference.content.attachment.creation,,,
-EuMadoDicomKosDocumentReference,content.format,MS,MadoDicomKosDocumentReference.content.format,,,
-EuMadoDicomKosDocumentReference,context,,MadoDicomKosDocumentReference.context,,,
+EuMadoDicomKosDocumentReference,content.attachment.creation,MS,MadoDicomKosDocumentReference.content.attachment.creation,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,content.format,MS,MadoDicomKosDocumentReference.content.format,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,context,,MadoDicomKosDocumentReference.context,,,EU-MADO requirement
 EuMadoDicomKosDocumentReference,context.id,,MadoDicomKosDocumentReference.context.id,,,
 EuMadoDicomKosDocumentReference,context.extension,,MadoDicomKosDocumentReference.context.extension,,,
 EuMadoDicomKosDocumentReference,context.modifierExtension,,MadoDicomKosDocumentReference.context.modifierExtension,,,
 EuMadoDicomKosDocumentReference,context.encounter,,MadoDicomKosDocumentReference.context.encounter,,,
 EuMadoDicomKosDocumentReference,context.event,,MadoDicomKosDocumentReference.context.event,,,
-EuMadoDicomKosDocumentReference,context.period,MS,MadoDicomKosDocumentReference.context.period,,,
+EuMadoDicomKosDocumentReference,context.period,MS,MadoDicomKosDocumentReference.context.period,,,EU-MADO requirement
 EuMadoDicomKosDocumentReference,context.period.id,,MadoDicomKosDocumentReference.context.period.id,,,
 EuMadoDicomKosDocumentReference,context.period.extension,,MadoDicomKosDocumentReference.context.period.extension,,,
 EuMadoDicomKosDocumentReference,context.period.start,,MadoDicomKosDocumentReference.context.period.start,,,
 EuMadoDicomKosDocumentReference,context.period.end,,MadoDicomKosDocumentReference.context.period.end,,,
-EuMadoDicomKosDocumentReference,context.facilityType,MS,MadoDicomKosDocumentReference.context.facilityType,,,
-EuMadoDicomKosDocumentReference,context.practiceSetting,MS,MadoDicomKosDocumentReference.context.practiceSetting,,,
-EuMadoDicomKosDocumentReference,context.sourcePatientInfo,MS,MadoDicomKosDocumentReference.context.sourcePatientInfo,,,
+EuMadoDicomKosDocumentReference,context.facilityType,MS,MadoDicomKosDocumentReference.context.facilityType,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,context.practiceSetting,MS,MadoDicomKosDocumentReference.context.practiceSetting,,,EU-MADO requirement
+EuMadoDicomKosDocumentReference,context.sourcePatientInfo,MS,MadoDicomKosDocumentReference.context.sourcePatientInfo,,,EU-MADO requirement
 EuMadoDicomKosDocumentReference,context.sourcePatientInfo.id,,MadoDicomKosDocumentReference.context.sourcePatientInfo.id,,,
 EuMadoDicomKosDocumentReference,context.sourcePatientInfo.extension,,MadoDicomKosDocumentReference.context.sourcePatientInfo.extension,,,
 EuMadoDicomKosDocumentReference,context.sourcePatientInfo.reference,,MadoDicomKosDocumentReference.context.sourcePatientInfo.reference,,,
@@ -325,32 +318,25 @@ EuMadoFhirDocumentReference,language,,MadoFhirDocumentReference.language,,,
 EuMadoFhirDocumentReference,text,,MadoFhirDocumentReference.text,,,
 EuMadoFhirDocumentReference,contained,,MadoFhirDocumentReference.contained,,,
 EuMadoFhirDocumentReference,extension,,MadoFhirDocumentReference.extension,,,
-EuMadoFhirDocumentReference,extension[bodysite],MS,MadoFhirDocumentReference.extension[bodysite],,,
+EuMadoFhirDocumentReference,extension[bodysite],MS,MadoFhirDocumentReference.extension[bodysite],,,Required by MADO
 EuMadoFhirDocumentReference,extension.id,,MadoFhirDocumentReference.extension.id,,,
 EuMadoFhirDocumentReference,extension.extension,,MadoFhirDocumentReference.extension.extension,,,
-EuMadoFhirDocumentReference,extension.extension[concept],,MadoFhirDocumentReference.extension.extension[concept],,,
-EuMadoFhirDocumentReference,extension.extension.id,,MadoFhirDocumentReference.extension.extension.id,,,
-EuMadoFhirDocumentReference,extension.extension.extension,,MadoFhirDocumentReference.extension.extension.extension,,,
-EuMadoFhirDocumentReference,extension.extension.url,,MadoFhirDocumentReference.extension.extension.url,,,
-EuMadoFhirDocumentReference,extension.extension.value[x],,MadoFhirDocumentReference.extension.extension.value[x],,,
-EuMadoFhirDocumentReference,extension.extension[reference],,MadoFhirDocumentReference.extension.extension[reference],,,
-EuMadoFhirDocumentReference,extension.extension[_datatype],,MadoFhirDocumentReference.extension.extension[_datatype],,,
 EuMadoFhirDocumentReference,extension.url,,MadoFhirDocumentReference.extension.url,,,
 EuMadoFhirDocumentReference,extension.value[x],,MadoFhirDocumentReference.extension.value[x],,,
-EuMadoFhirDocumentReference,extension[modality],MS,MadoFhirDocumentReference.extension[modality],,,
+EuMadoFhirDocumentReference,extension[modality],MS,MadoFhirDocumentReference.extension[modality],,,Required by MADO
 EuMadoFhirDocumentReference,modifierExtension,,MadoFhirDocumentReference.modifierExtension,,,
 EuMadoFhirDocumentReference,masterIdentifier,,MadoFhirDocumentReference.masterIdentifier,,,
-EuMadoFhirDocumentReference,identifier,MS,MadoFhirDocumentReference.identifier,,,
-EuMadoFhirDocumentReference,identifier[entryUUID],MS,MadoFhirDocumentReference.identifier[entryUUID],,,
+EuMadoFhirDocumentReference,identifier,MS,MadoFhirDocumentReference.identifier,,,Required by MADO
+EuMadoFhirDocumentReference,identifier[entryUUID],MS,MadoFhirDocumentReference.identifier[entryUUID],,,EU-MADO requirement
 EuMadoFhirDocumentReference,status,,MadoFhirDocumentReference.status,,,
 EuMadoFhirDocumentReference,docStatus,,MadoFhirDocumentReference.docStatus,,,
-EuMadoFhirDocumentReference,type,MS,MadoFhirDocumentReference.type,,,
-EuMadoFhirDocumentReference,category,MS,MadoFhirDocumentReference.category,,,
-EuMadoFhirDocumentReference,subject,MS,MadoFhirDocumentReference.subject,,,
-EuMadoFhirDocumentReference,date,MS,MadoFhirDocumentReference.date,,,
-EuMadoFhirDocumentReference,author,MS,MadoFhirDocumentReference.author,,,
-EuMadoFhirDocumentReference,author[source-organization],MS,MadoFhirDocumentReference.author[source-organization],,,
-EuMadoFhirDocumentReference,author[source-device],MS,MadoFhirDocumentReference.author[source-device],,,
+EuMadoFhirDocumentReference,type,MS,MadoFhirDocumentReference.type,,,Required by MADO
+EuMadoFhirDocumentReference,category,MS,MadoFhirDocumentReference.category,,,Required by MADO
+EuMadoFhirDocumentReference,subject,MS,MadoFhirDocumentReference.subject,,,Required by MADO
+EuMadoFhirDocumentReference,date,MS,MadoFhirDocumentReference.date,,,Required by MADO
+EuMadoFhirDocumentReference,author,MS,MadoFhirDocumentReference.author,,,EU-MADO requirement
+EuMadoFhirDocumentReference,author[source-organization],MS,MadoFhirDocumentReference.author[source-organization],,,Required by MADO
+EuMadoFhirDocumentReference,author[source-device],MS,MadoFhirDocumentReference.author[source-device],,,Required by MADO
 EuMadoFhirDocumentReference,authenticator,,MadoFhirDocumentReference.authenticator,,,
 EuMadoFhirDocumentReference,custodian,,MadoFhirDocumentReference.custodian,,,
 EuMadoFhirDocumentReference,relatesTo,MS,MadoFhirDocumentReference.relatesTo,,,
@@ -359,16 +345,17 @@ EuMadoFhirDocumentReference,relatesTo.extension,,MadoFhirDocumentReference.relat
 EuMadoFhirDocumentReference,relatesTo.modifierExtension,,MadoFhirDocumentReference.relatesTo.modifierExtension,,,
 EuMadoFhirDocumentReference,relatesTo.code,,MadoFhirDocumentReference.relatesTo.code,,,
 EuMadoFhirDocumentReference,relatesTo.target,,MadoFhirDocumentReference.relatesTo.target,,,
-EuMadoFhirDocumentReference,relatesTo[kos-reference],MS,MadoFhirDocumentReference.relatesTo[kos-reference],,,
+EuMadoFhirDocumentReference,relatesTo[kos-reference],MS,MadoFhirDocumentReference.relatesTo[kos-reference],,,EU-MADO requirement
+EuMadoFhirDocumentReference,relatesTo.target,,MadoFhirDocumentReference.relatesTo.target,,,Required by MADO
 EuMadoFhirDocumentReference,description,,MadoFhirDocumentReference.description,,,
-EuMadoFhirDocumentReference,securityLabel,MS,MadoFhirDocumentReference.securityLabel,,,
+EuMadoFhirDocumentReference,securityLabel,MS,MadoFhirDocumentReference.securityLabel,,,Required by MADO
 EuMadoFhirDocumentReference,content,,MadoFhirDocumentReference.content,,,
 EuMadoFhirDocumentReference,content.id,,MadoFhirDocumentReference.content.id,,,
 EuMadoFhirDocumentReference,content.extension,,MadoFhirDocumentReference.content.extension,,,
 EuMadoFhirDocumentReference,content.extension[profile],,MadoFhirDocumentReference.content.extension[profile],,,
 EuMadoFhirDocumentReference,content.extension.id,,MadoFhirDocumentReference.content.extension.id,,,
 EuMadoFhirDocumentReference,content.extension.extension,,MadoFhirDocumentReference.content.extension.extension,,,
-EuMadoFhirDocumentReference,content.extension.extension[value[x]],,MadoFhirDocumentReference.content.extension.extension[value[x]],,,
+EuMadoFhirDocumentReference,content.extension.extension[value],,MadoFhirDocumentReference.content.extension.extension[value],,,
 EuMadoFhirDocumentReference,content.extension.extension.id,,MadoFhirDocumentReference.content.extension.extension.id,,,
 EuMadoFhirDocumentReference,content.extension.extension.extension,,MadoFhirDocumentReference.content.extension.extension.extension,,,
 EuMadoFhirDocumentReference,content.extension.extension.url,,MadoFhirDocumentReference.content.extension.extension.url,,,
@@ -381,14 +368,14 @@ EuMadoFhirDocumentReference,content.attachment,,MadoFhirDocumentReference.conten
 EuMadoFhirDocumentReference,content.attachment.id,,MadoFhirDocumentReference.content.attachment.id,,,
 EuMadoFhirDocumentReference,content.attachment.extension,,MadoFhirDocumentReference.content.attachment.extension,,,
 EuMadoFhirDocumentReference,content.attachment.contentType,,MadoFhirDocumentReference.content.attachment.contentType,,,
-EuMadoFhirDocumentReference,content.attachment.language,MS,MadoFhirDocumentReference.content.attachment.language,,,
+EuMadoFhirDocumentReference,content.attachment.language,MS,MadoFhirDocumentReference.content.attachment.language,,,EU-MADO requirement
 EuMadoFhirDocumentReference,content.attachment.data,,MadoFhirDocumentReference.content.attachment.data,,,
 EuMadoFhirDocumentReference,content.attachment.url,,MadoFhirDocumentReference.content.attachment.url,,,
 EuMadoFhirDocumentReference,content.attachment.size,,MadoFhirDocumentReference.content.attachment.size,,,
 EuMadoFhirDocumentReference,content.attachment.hash,,MadoFhirDocumentReference.content.attachment.hash,,,
 EuMadoFhirDocumentReference,content.attachment.title,,MadoFhirDocumentReference.content.attachment.title,,,
-EuMadoFhirDocumentReference,content.attachment.creation,MS,MadoFhirDocumentReference.content.attachment.creation,,,
-EuMadoFhirDocumentReference,content.format,MS,MadoFhirDocumentReference.content.format,,,
+EuMadoFhirDocumentReference,content.attachment.creation,MS,MadoFhirDocumentReference.content.attachment.creation,,,EU-MADO requirement
+EuMadoFhirDocumentReference,content.format,MS,MadoFhirDocumentReference.content.format,,,EU-MADO requirement
 EuMadoFhirDocumentReference,content.format.id,,MadoFhirDocumentReference.content.format.id,,,
 EuMadoFhirDocumentReference,content.format.extension,,MadoFhirDocumentReference.content.format.extension,,,
 EuMadoFhirDocumentReference,content.format.system,,MadoFhirDocumentReference.content.format.system,,,
@@ -396,20 +383,20 @@ EuMadoFhirDocumentReference,content.format.version,,MadoFhirDocumentReference.co
 EuMadoFhirDocumentReference,content.format.code,,MadoFhirDocumentReference.content.format.code,,,
 EuMadoFhirDocumentReference,content.format.display,,MadoFhirDocumentReference.content.format.display,,,
 EuMadoFhirDocumentReference,content.format.userSelected,,MadoFhirDocumentReference.content.format.userSelected,,,
-EuMadoFhirDocumentReference,context,,MadoFhirDocumentReference.context,,,
+EuMadoFhirDocumentReference,context,,MadoFhirDocumentReference.context,,,EU-MADO requirement
 EuMadoFhirDocumentReference,context.id,,MadoFhirDocumentReference.context.id,,,
 EuMadoFhirDocumentReference,context.extension,,MadoFhirDocumentReference.context.extension,,,
 EuMadoFhirDocumentReference,context.modifierExtension,,MadoFhirDocumentReference.context.modifierExtension,,,
 EuMadoFhirDocumentReference,context.encounter,,MadoFhirDocumentReference.context.encounter,,,
 EuMadoFhirDocumentReference,context.event,,MadoFhirDocumentReference.context.event,,,
-EuMadoFhirDocumentReference,context.period,MS,MadoFhirDocumentReference.context.period,,,
+EuMadoFhirDocumentReference,context.period,MS,MadoFhirDocumentReference.context.period,,,EU-MADO requirement
 EuMadoFhirDocumentReference,context.period.id,,MadoFhirDocumentReference.context.period.id,,,
 EuMadoFhirDocumentReference,context.period.extension,,MadoFhirDocumentReference.context.period.extension,,,
 EuMadoFhirDocumentReference,context.period.start,,MadoFhirDocumentReference.context.period.start,,,
 EuMadoFhirDocumentReference,context.period.end,,MadoFhirDocumentReference.context.period.end,,,
-EuMadoFhirDocumentReference,context.facilityType,MS,MadoFhirDocumentReference.context.facilityType,,,
-EuMadoFhirDocumentReference,context.practiceSetting,MS,MadoFhirDocumentReference.context.practiceSetting,,,
-EuMadoFhirDocumentReference,context.sourcePatientInfo,MS,MadoFhirDocumentReference.context.sourcePatientInfo,,,
+EuMadoFhirDocumentReference,context.facilityType,MS,MadoFhirDocumentReference.context.facilityType,,,EU-MADO requirement
+EuMadoFhirDocumentReference,context.practiceSetting,MS,MadoFhirDocumentReference.context.practiceSetting,,,EU-MADO requirement
+EuMadoFhirDocumentReference,context.sourcePatientInfo,MS,MadoFhirDocumentReference.context.sourcePatientInfo,,,EU-MADO requirement
 EuMadoFhirDocumentReference,context.sourcePatientInfo.id,,MadoFhirDocumentReference.context.sourcePatientInfo.id,,,
 EuMadoFhirDocumentReference,context.sourcePatientInfo.extension,,MadoFhirDocumentReference.context.sourcePatientInfo.extension,,,
 EuMadoFhirDocumentReference,context.sourcePatientInfo.reference,,MadoFhirDocumentReference.context.sourcePatientInfo.reference,,,
@@ -426,49 +413,49 @@ EuMadoImagingStudy,language,,MadoImagingStudy.language,,,
 EuMadoImagingStudy,text,,MadoImagingStudy.text,,,
 EuMadoImagingStudy,contained,,MadoImagingStudy.contained,,,
 EuMadoImagingStudy,extension,,MadoImagingStudy.extension,,,
-EuMadoImagingStudy,extension[anatomical-region],MS,MadoImagingStudy.extension[anatomical-region],SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.bodySite
+EuMadoImagingStudy,extension[anatomical-region],MS,MadoImagingStudy.extension[anatomical-region],,,EHDSImagingStudy.bodySite
 EuMadoImagingStudy,extension.id,,MadoImagingStudy.extension.id,,,
 EuMadoImagingStudy,extension.extension,,MadoImagingStudy.extension.extension,,,
 EuMadoImagingStudy,extension.url,,MadoImagingStudy.extension.url,,,
 EuMadoImagingStudy,extension.value[x],,MadoImagingStudy.extension.value[x],,,
 EuMadoImagingStudy,modifierExtension,,MadoImagingStudy.modifierExtension,,,
 EuMadoImagingStudy,identifier,,MadoImagingStudy.identifier,,,
-EuMadoImagingStudy,identifier[study-instance-uid],MS,MadoImagingStudy.identifier[study-instance-uid],,SHALL:populate,Required by MADO
+EuMadoImagingStudy,identifier[study-instance-uid],MS,MadoImagingStudy.identifier[study-instance-uid],,,Required by MADO
 EuMadoImagingStudy,status,,MadoImagingStudy.status,,,
-EuMadoImagingStudy,modality,MS,MadoImagingStudy.modality,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.modality
-EuMadoImagingStudy,subject,MS,MadoImagingStudy.subject,SHOULD:process,SHOULD:able-to-populate,EHDSImagingStudy.subject
+EuMadoImagingStudy,modality,MS,MadoImagingStudy.modality,,,EHDSImagingStudy.modality
+EuMadoImagingStudy,subject,MS,MadoImagingStudy.subject,,,EHDSImagingStudy.subject
 EuMadoImagingStudy,encounter,,MadoImagingStudy.encounter,,,
-EuMadoImagingStudy,started,MS,MadoImagingStudy.started,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.started
+EuMadoImagingStudy,started,MS,MadoImagingStudy.started,,,EHDSImagingStudy.started
 EuMadoImagingStudy,basedOn,,MadoImagingStudy.basedOn,,,
-EuMadoImagingStudy,basedOn[order],MS,MadoImagingStudy.basedOn[order],SHOULD:process,SHOULD:able-to-populate,EHDSImagingStudy.basedOn
+EuMadoImagingStudy,basedOn[order],MS,MadoImagingStudy.basedOn[order],,,EHDSImagingStudy.basedOn
 EuMadoImagingStudy,referrer,,MadoImagingStudy.referrer,,,
 EuMadoImagingStudy,interpreter,,MadoImagingStudy.interpreter,,,
 EuMadoImagingStudy,endpoint,,MadoImagingStudy.endpoint,,,
-EuMadoImagingStudy,endpoint[webviewer],MS,MadoImagingStudy.endpoint[webviewer],SHOULD:process,SHOULD:able-to-populate,EHDSImagingStudy.endpoint
-EuMadoImagingStudy,numberOfSeries,MS,MadoImagingStudy.numberOfSeries,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.numberOfSeries
-EuMadoImagingStudy,numberOfInstances,MS,MadoImagingStudy.numberOfInstances,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.numberOfInstances
+EuMadoImagingStudy,endpoint[webviewer],MS,MadoImagingStudy.endpoint[webviewer],,,EHDSImagingStudy.endpoint
+EuMadoImagingStudy,numberOfSeries,MS,MadoImagingStudy.numberOfSeries,,,EHDSImagingStudy.numberOfSeries
+EuMadoImagingStudy,numberOfInstances,MS,MadoImagingStudy.numberOfInstances,,,EHDSImagingStudy.numberOfInstances
 EuMadoImagingStudy,procedureReference,,MadoImagingStudy.procedureReference,,,
-EuMadoImagingStudy,procedureCode,MS,MadoImagingStudy.procedureCode,,SHALL-populate,Required by MADO
+EuMadoImagingStudy,procedureCode,MS,MadoImagingStudy.procedureCode,,,Required by MADO
 EuMadoImagingStudy,location,,MadoImagingStudy.location,,,
 EuMadoImagingStudy,reasonCode,,MadoImagingStudy.reasonCode,,,
 EuMadoImagingStudy,reasonReference,,MadoImagingStudy.reasonReference,,,
 EuMadoImagingStudy,note,,MadoImagingStudy.note,,,
-EuMadoImagingStudy,description,MS,MadoImagingStudy.description,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.description
-EuMadoImagingStudy,series,MS,MadoImagingStudy.series,SHOULD:process,SHALL:populate,EHDSImagingStudy.series
+EuMadoImagingStudy,description,MS,MadoImagingStudy.description,,,EHDSImagingStudy.description
+EuMadoImagingStudy,series,MS,MadoImagingStudy.series,,,EHDSImagingStudy.series
 EuMadoImagingStudy,series.id,,MadoImagingStudy.series.id,,,
 EuMadoImagingStudy,series.extension,,MadoImagingStudy.series.extension,,,
 EuMadoImagingStudy,series.modifierExtension,,MadoImagingStudy.series.modifierExtension,,,
-EuMadoImagingStudy,series.uid,MS,MadoImagingStudy.series.uid,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.uid
-EuMadoImagingStudy,series.number,MS,MadoImagingStudy.series.number,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.number
-EuMadoImagingStudy,series.modality,MS,MadoImagingStudy.series.modality,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.seriesModality
-EuMadoImagingStudy,series.description,MS,MadoImagingStudy.series.description,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.description
-EuMadoImagingStudy,series.numberOfInstances,MS,MadoImagingStudy.series.numberOfInstances,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.numberOfInstances
+EuMadoImagingStudy,series.uid,MS,MadoImagingStudy.series.uid,,,EHDSImagingStudy.series.uid
+EuMadoImagingStudy,series.number,MS,MadoImagingStudy.series.number,,,EHDSImagingStudy.series.number
+EuMadoImagingStudy,series.modality,MS,MadoImagingStudy.series.modality,,,EHDSImagingStudy.series.seriesModality
+EuMadoImagingStudy,series.description,MS,MadoImagingStudy.series.description,,,EHDSImagingStudy.series.description
+EuMadoImagingStudy,series.numberOfInstances,MS,MadoImagingStudy.series.numberOfInstances,,,EHDSImagingStudy.series.numberOfInstances
 EuMadoImagingStudy,series.endpoint,,MadoImagingStudy.series.endpoint,,,
-EuMadoImagingStudy,series.endpoint[wado],MS,MadoImagingStudy.series.endpoint[wado],SHOULD:process,SHALL:populate,EHDSImagingStudy.endpoint & EHDSImagingStudy.series.seriesEndpoint
-EuMadoImagingStudy,series.bodySite,MS,MadoImagingStudy.series.bodySite,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.bodySite
-EuMadoImagingStudy,series.laterality,MS,MadoImagingStudy.series.laterality,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.started
-EuMadoImagingStudy,series.specimen,MS,MadoImagingStudy.series.specimen,,SHALL:able-to-populate,Required by MADO
-EuMadoImagingStudy,series.started,MS,MadoImagingStudy.series.started,SHOULD:process,SHALL:able-to-populate,EHDSImagingStudy.series.started
+EuMadoImagingStudy,series.endpoint[wado],MS,MadoImagingStudy.series.endpoint[wado],,,EHDSImagingStudy.endpoint & EHDSImagingStudy.series.seriesEndpoint
+EuMadoImagingStudy,series.bodySite,MS,MadoImagingStudy.series.bodySite,,,EHDSImagingStudy.series.bodySite
+EuMadoImagingStudy,series.laterality,MS,MadoImagingStudy.series.laterality,,,EHDSImagingStudy.series.started
+EuMadoImagingStudy,series.specimen,MS,MadoImagingStudy.series.specimen,,,Required by MADO
+EuMadoImagingStudy,series.started,MS,MadoImagingStudy.series.started,,,EHDSImagingStudy.series.started
 EuMadoImagingStudy,series.performer,,MadoImagingStudy.series.performer,,,
 EuMadoImagingStudy,series.performer.id,,MadoImagingStudy.series.performer.id,,,
 EuMadoImagingStudy,series.performer.extension,,MadoImagingStudy.series.performer.extension,,,
@@ -478,13 +465,13 @@ EuMadoImagingStudy,series.performer.actor,,MadoImagingStudy.series.performer.act
 EuMadoImagingStudy,series.instance,,MadoImagingStudy.series.instance,,,
 EuMadoImagingStudy,series.instance.id,,MadoImagingStudy.series.instance.id,,,
 EuMadoImagingStudy,series.instance.extension,,MadoImagingStudy.series.instance.extension,,,
-EuMadoImagingStudy,series.instance.extension[number-of-frames],MS,MadoImagingStudy.series.instance.extension[number-of-frames],,SHALL:able-to-populate,Required by MADO
-EuMadoImagingStudy,series.instance.extension[ko-document-title],MS,MadoImagingStudy.series.instance.extension[ko-document-title],,SHALL:able-to-populate,Required by MADO
+EuMadoImagingStudy,series.instance.extension[number-of-frames],MS,MadoImagingStudy.series.instance.extension[number-of-frames],,,Required by MADO
+EuMadoImagingStudy,series.instance.extension[ko-document-title],MS,MadoImagingStudy.series.instance.extension[ko-document-title],,,Required by MADO
 EuMadoImagingStudy,series.instance.modifierExtension,,MadoImagingStudy.series.instance.modifierExtension,,,
-EuMadoImagingStudy,series.instance.uid,MS,MadoImagingStudy.series.instance.uid,,SHALL:populate,Required by MADO
-EuMadoImagingStudy,series.instance.sopClass,MS,MadoImagingStudy.series.instance.sopClass,,SHALL:able-to-populate,Required by MADO
-EuMadoImagingStudy,series.instance.number,MS,MadoImagingStudy.series.instance.number,,SHALL:able-to-populate,Required by MADO
-EuMadoImagingStudy,series.instance.title,MS,MadoImagingStudy.series.instance.title,,SHALL:able-to-populate,Required by MADO
+EuMadoImagingStudy,series.instance.uid,MS,MadoImagingStudy.series.instance.uid,,,Required by IHE-MADO
+EuMadoImagingStudy,series.instance.sopClass,MS,MadoImagingStudy.series.instance.sopClass,,,Required by MADO
+EuMadoImagingStudy,series.instance.number,MS,MadoImagingStudy.series.instance.number,,,Required by MADO
+EuMadoImagingStudy,series.instance.title,MS,MadoImagingStudy.series.instance.title,,,Required by MADO
 EuMadoPatient,id,,MadoPatient.id,,,
 EuMadoPatient,meta,,MadoPatient.meta,,,
 EuMadoPatient,implicitRules,,MadoPatient.implicitRules,,,
@@ -493,21 +480,21 @@ EuMadoPatient,text,,MadoPatient.text,,,
 EuMadoPatient,contained,,MadoPatient.contained,,,
 EuMadoPatient,extension,,MadoPatient.extension,,,
 EuMadoPatient,modifierExtension,,MadoPatient.modifierExtension,,,
-EuMadoPatient,identifier,MS,MadoPatient.identifier,,SHALL:able-to-populate,EHDSPatient.identifier
+EuMadoPatient,identifier,MS,MadoPatient.identifier,,,EHDSPatient.identifier
 EuMadoPatient,active,,MadoPatient.active,,,
-EuMadoPatient,name,MS,MadoPatient.name,,SHALL:able-to-populate,EHDSPatient.name
+EuMadoPatient,name,MS,MadoPatient.name,,,EHDSPatient.name
 EuMadoPatient,name.id,,MadoPatient.name.id,,,
 EuMadoPatient,name.extension,,MadoPatient.name.extension,,,
-EuMadoPatient,name.use,,MadoPatient.name.use,,SHALL:able-to-populate,EHDSPatient.name.use
-EuMadoPatient,name.text,,MadoPatient.name.text,,SHOULD:able-to-populate,EHDSPatient.name.text
-EuMadoPatient,name.family,,MadoPatient.name.family,,SHALL:able-to-populate,EHDSPatient.name.family
-EuMadoPatient,name.given,,MadoPatient.name.given,,SHALL:able-to-populate,EHDSPatient.name.given
+EuMadoPatient,name.use,,MadoPatient.name.use,,,EHDSPatient.name.use
+EuMadoPatient,name.text,,MadoPatient.name.text,,,EHDSPatient.name.text
+EuMadoPatient,name.family,,MadoPatient.name.family,,,EHDSPatient.name.family
+EuMadoPatient,name.given,,MadoPatient.name.given,,,EHDSPatient.name.given
 EuMadoPatient,name.prefix,,MadoPatient.name.prefix,,,
 EuMadoPatient,name.suffix,,MadoPatient.name.suffix,,,
 EuMadoPatient,name.period,,MadoPatient.name.period,,,
 EuMadoPatient,telecom,,MadoPatient.telecom,,,
-EuMadoPatient,gender,MS,MadoPatient.gender,,SHOULD:able-to-populate,EHDSPatient.administrativeGender
-EuMadoPatient,birthDate,MS,MadoPatient.birthDate,,SHOULD:able-to-populate,EHDSPatient.birthDate
+EuMadoPatient,gender,MS,MadoPatient.gender,,,EHDSPatient.administrativeGender
+EuMadoPatient,birthDate,MS,MadoPatient.birthDate,,,EHDSPatient.birthDate
 EuMadoPatient,deceased[x],,MadoPatient.deceased[x],,,
 EuMadoPatient,address,,MadoPatient.address,,,
 EuMadoPatient,maritalStatus,,MadoPatient.maritalStatus,,,
@@ -547,8 +534,7 @@ EuMadoRequestedProcedure,contained,,MadoRequestedProcedure.contained,,,
 EuMadoRequestedProcedure,extension,,MadoRequestedProcedure.extension,,,
 EuMadoRequestedProcedure,modifierExtension,,MadoRequestedProcedure.modifierExtension,,,
 EuMadoRequestedProcedure,identifier,,MadoRequestedProcedure.identifier,,,
-EuMadoRequestedProcedure,identifier[accession-number],MS,MadoRequestedProcedure.identifier[accession-number],,SHALL:populate,Required by MADO
-EuMadoRequestedProcedure,identifier[placer],MS,MadoRequestedProcedure.identifier[placer],,SHALL:able-to-populate,Required by MADO
+EuMadoRequestedProcedure,identifier[accession-number],MS,MadoRequestedProcedure.identifier[accession-number],,,Required by MADO
 EuMadoRequestedProcedure,identifier.id,,MadoRequestedProcedure.identifier.id,,,
 EuMadoRequestedProcedure,identifier.extension,,MadoRequestedProcedure.identifier.extension,,,
 EuMadoRequestedProcedure,identifier.use,,MadoRequestedProcedure.identifier.use,,,
@@ -556,21 +542,15 @@ EuMadoRequestedProcedure,identifier.type,,MadoRequestedProcedure.identifier.type
 EuMadoRequestedProcedure,identifier.type.id,,MadoRequestedProcedure.identifier.type.id,,,
 EuMadoRequestedProcedure,identifier.type.extension,,MadoRequestedProcedure.identifier.type.extension,,,
 EuMadoRequestedProcedure,identifier.type.coding,,MadoRequestedProcedure.identifier.type.coding,,,
-EuMadoRequestedProcedure,identifier.type.coding[placer],,MadoRequestedProcedure.identifier.type.coding[placer],,,
-EuMadoRequestedProcedure,identifier.type.coding.id,,MadoRequestedProcedure.identifier.type.coding.id,,,
-EuMadoRequestedProcedure,identifier.type.coding.extension,,MadoRequestedProcedure.identifier.type.coding.extension,,,
-EuMadoRequestedProcedure,identifier.type.coding.system,,MadoRequestedProcedure.identifier.type.coding.system,,,
-EuMadoRequestedProcedure,identifier.type.coding.version,,MadoRequestedProcedure.identifier.type.coding.version,,,
-EuMadoRequestedProcedure,identifier.type.coding.code,,MadoRequestedProcedure.identifier.type.coding.code,,,
-EuMadoRequestedProcedure,identifier.type.coding.display,,MadoRequestedProcedure.identifier.type.coding.display,,,
-EuMadoRequestedProcedure,identifier.type.coding.userSelected,,MadoRequestedProcedure.identifier.type.coding.userSelected,,,
+EuMadoRequestedProcedure,identifier.type.coding[v2-0203-coding],,MadoRequestedProcedure.identifier.type.coding[v2-0203-coding],,,
+EuMadoRequestedProcedure,identifier.type.coding[dcm],,MadoRequestedProcedure.identifier.type.coding[dcm],,,
 EuMadoRequestedProcedure,identifier.type.text,,MadoRequestedProcedure.identifier.type.text,,,
 EuMadoRequestedProcedure,identifier.system,,MadoRequestedProcedure.identifier.system,,,
 EuMadoRequestedProcedure,identifier.value,,MadoRequestedProcedure.identifier.value,,,
 EuMadoRequestedProcedure,identifier.period,,MadoRequestedProcedure.identifier.period,,,
 EuMadoRequestedProcedure,identifier.assigner,,MadoRequestedProcedure.identifier.assigner,,,
+EuMadoRequestedProcedure,identifier[placer],MS,MadoRequestedProcedure.identifier[placer],,,Required by MADO
 EuMadoRequestedProcedure,identifier[filler],,MadoRequestedProcedure.identifier[filler],,,
-EuMadoRequestedProcedure,identifier.type.coding[filler],,MadoRequestedProcedure.identifier.type.coding[filler],,,
 EuMadoRequestedProcedure,instantiatesCanonical,,MadoRequestedProcedure.instantiatesCanonical,,,
 EuMadoRequestedProcedure,instantiatesUri,,MadoRequestedProcedure.instantiatesUri,,,
 EuMadoRequestedProcedure,basedOn,,MadoRequestedProcedure.basedOn,,,
@@ -610,7 +590,7 @@ EuMadoWadoEndpoint,language,,MadoWadoEndpoint.language,,,
 EuMadoWadoEndpoint,text,,MadoWadoEndpoint.text,,,
 EuMadoWadoEndpoint,contained,,MadoWadoEndpoint.contained,,,
 EuMadoWadoEndpoint,extension,,MadoWadoEndpoint.extension,,,
-EuMadoWadoEndpoint,extension[retrieve-location-uid],MS,MadoWadoEndpoint.extension[retrieve-location-uid],,SHALL:able-to-populate,Required by MADO
+EuMadoWadoEndpoint,extension[retrieve-location-uid],MS,MadoWadoEndpoint.extension[retrieve-location-uid],,,Required by MADO
 EuMadoWadoEndpoint,modifierExtension,,MadoWadoEndpoint.modifierExtension,,,
 EuMadoWadoEndpoint,identifier,,MadoWadoEndpoint.identifier,,,
 EuMadoWadoEndpoint,status,,MadoWadoEndpoint.status,,,
@@ -641,7 +621,7 @@ EuMadoWadoEndpoint,payloadType.coding.display,,MadoWadoEndpoint.payloadType.codi
 EuMadoWadoEndpoint,payloadType.coding.userSelected,,MadoWadoEndpoint.payloadType.coding.userSelected,,,
 EuMadoWadoEndpoint,payloadType.text,,MadoWadoEndpoint.payloadType.text,,,
 EuMadoWadoEndpoint,payloadMimeType,,MadoWadoEndpoint.payloadMimeType,,,
-EuMadoWadoEndpoint,address,MS,MadoWadoEndpoint.address,,SHALL:able-to-populate,Required by MADO
+EuMadoWadoEndpoint,address,MS,MadoWadoEndpoint.address,,,Required by MADO
 EuMadoWadoEndpoint,address.id,,MadoWadoEndpoint.address.id,,,
 EuMadoWadoEndpoint,address.extension,,MadoWadoEndpoint.address.extension,,,
 EuMadoWadoEndpoint,address.extension[data-absent-reason],,MadoWadoEndpoint.address.extension[data-absent-reason],,,
@@ -671,6 +651,7 @@ EuMadoWebViewerEndpoint,payloadType[type-none],,MadoWebViewerEndpoint.payloadTyp
 EuMadoWebViewerEndpoint,payloadType.id,,MadoWebViewerEndpoint.payloadType.id,,,
 EuMadoWebViewerEndpoint,payloadType.extension,,MadoWebViewerEndpoint.payloadType.extension,,,
 EuMadoWebViewerEndpoint,payloadType.coding,,MadoWebViewerEndpoint.payloadType.coding,,,
+EuMadoWebViewerEndpoint,payloadType.coding[none],,MadoWebViewerEndpoint.payloadType.coding[none],,,
 EuMadoWebViewerEndpoint,payloadType.coding.id,,MadoWebViewerEndpoint.payloadType.coding.id,,,
 EuMadoWebViewerEndpoint,payloadType.coding.extension,,MadoWebViewerEndpoint.payloadType.coding.extension,,,
 EuMadoWebViewerEndpoint,payloadType.coding.system,,MadoWebViewerEndpoint.payloadType.coding.system,,,
@@ -680,5 +661,6 @@ EuMadoWebViewerEndpoint,payloadType.coding.display,,MadoWebViewerEndpoint.payloa
 EuMadoWebViewerEndpoint,payloadType.coding.userSelected,,MadoWebViewerEndpoint.payloadType.coding.userSelected,,,
 EuMadoWebViewerEndpoint,payloadType.text,,MadoWebViewerEndpoint.payloadType.text,,,
 EuMadoWebViewerEndpoint,payloadMimeType,,MadoWebViewerEndpoint.payloadMimeType,,,
-EuMadoWebViewerEndpoint,address,MS,MadoWebViewerEndpoint.address,,SHALL:populate,Required by MADO
+EuMadoWebViewerEndpoint,payloadMimeType[html],,MadoWebViewerEndpoint.payloadMimeType[html],,,
+EuMadoWebViewerEndpoint,address,MS,MadoWebViewerEndpoint.address,,,Required by MADO
 EuMadoWebViewerEndpoint,header,,MadoWebViewerEndpoint.header,,,
