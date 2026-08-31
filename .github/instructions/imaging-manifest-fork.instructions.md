@@ -100,6 +100,16 @@ This convention applies **only to top-level pages** that are listed under `pages
 
 **Exception — included fragments.** Pages that are not listed under `pages:` and are instead pulled into another page via `{% include <file>.md %}` (for example the `dicom-module-*` and `dicom-template-*` fragments) are exempt from this rule. Their headings must fit within the heading hierarchy of the host page that includes them, so they may legitimately start at `##` or use whatever level the host page requires.
 
+**Worknotes**
+
+A "worknote" refers to the yellow work-in-progress banner rendered via the Jekyll include `input/includes/worknote.html`, e.g.:
+
+```
+{% include worknote.html text="This profile must be updated once ... " %}
+```
+
+"Does the spec have a worknote about X" means: search `input/pagecontent/**` (and `input/includes/**`) for `{% include worknote.html %}` occurrences and check their `text=` content — not just prose mentions of the issue elsewhere on a page.
+
 **Slice Naming Convention**
 
 All slice names must use **kebab-case** (lowercase with hyphens) consistent with the IHE-MADO parent project. Examples:
