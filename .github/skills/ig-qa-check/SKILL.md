@@ -23,6 +23,7 @@ The skill's persistent memory of known specification URLs is maintained in [spec
 - Confirm that generated StructureDefinition descriptions do not retain unresolved profile tokens.
 - Audit example coverage for local profiles and named slices.
 - Check that every FHIR element carrying an obligation is marked Must Support.
+- Flag lower-case `may`, `should`, and `shall` in narrative prose that reads as an RFC 2119 keyword, and suggest either rewording or upper-casing.
 - Run a pre-release FHIR IG QA pass after narrative, profile, dependency, example, or link changes.
 
 ## Scope Rules
@@ -183,6 +184,29 @@ rg -n -i 'worknote\.html' input
 
 8. For completed items, cite the current source or generated evidence. For open items, identify the smallest owning change. For no-longer-applicable items, state what superseded them. If an item is derived from multiple notes, list each relevant work-note file. Do not edit the work note as part of this audit unless the user explicitly requests note maintenance.
 
+### 3a. Check lower-case normative language (may/should/shall)
+
+Narrative pages sometimes use `may`, `should`, or `shall` in ordinary prose where a reader could mistake the word for an RFC 2119 conformance keyword, or where the author actually intended a conformance keyword but left it lower-case. Both cases need a human-reviewable suggestion, not a silent rewrite.
+
+1. Search authoritative narrative source, excluding generated folders, for the whole-word, lower-case forms:
+
+```sh
+rg -n -w 'may|should|shall' input/pagecontent input/includes
+```
+
+2. Discard matches that are already upper-case (`MAY`, `SHOULD`, `SHALL`), matches inside code spans, URLs, or link destinations, and matches that are part of an unrelated compound term.
+3. For every remaining match, read the full sentence or paragraph containing it and classify the intent:
+	- **Genuine normative requirement** — the sentence states a conformance expectation for implementers (what a system SHALL, SHOULD, or MAY do). Proposed fix: capitalize the keyword to the RFC 2119 form. Note the candidate strength (`MAY`, `SHOULD`, or `SHALL`) based on the sentence's own wording, but flag it for author confirmation rather than assuming a stronger or weaker obligation than written.
+	- **Descriptive or explanatory prose** — the sentence is not stating a conformance rule (e.g., background, rationale, or a colloquial use of the word). Proposed fix: reword to avoid the ambiguous keyword instead of capitalizing it (for example, replace informal "should" with "is expected to", "typically", or "can"; replace informal "may" with "can" or "is permitted to").
+4. Do not apply either fix automatically; this check is report-first, matching the other audits in this skill. Only make the edit if the user separately confirms the specific wording.
+5. Report every finding in a table:
+
+| Page | Line | Paragraph / sentence | Proposed change |
+|---|---|---|---|
+| `input/pagecontent/example.md` | 42 | Full quoted sentence containing the match | "Capitalize to SHALL (normative requirement)" or "Reword to '...' (not a conformance rule)" |
+
+6. Include a row for a page with no lower-case matches only if the user asked for full coverage confirmation; otherwise omit clean pages from the table and state the total pages scanned.
+
 ### 4. Apply the smallest source changes
 
 Keep changes limited to the owning source files:
@@ -275,6 +299,7 @@ Include rows for every applicable procedure section, at minimum:
 - Jekyll alias and rendered-token checks.
 - Work-note include discovery and per-note validity checks.
 - Obligation-to-Must-Support consistency checks.
+- Lower-case `may`/`should`/`shall` normative-language review.
 - Profile and named-slice example coverage checks.
 - Spelling and grammar review.
 - IG build and example validation.
@@ -299,6 +324,7 @@ The check is complete when:
 - The final report lists every applicable check performed, including scope, evidence, and result.
 - The final report lists every issue found, ordered by severity, including file/artifact, evidence, and disposition; skipped checks are reported with reasons.
 - Every locally authored obligation-bearing FHIR element has been checked in the generated snapshot and is marked `mustSupport: true`, or any dependency-only exception is reported explicitly.
+- Every lower-case `may`, `should`, or `shall` found in narrative prose has been classified as a normative requirement or descriptive text, with a proposed capitalization or rewording reported in a table (page, line, paragraph, proposed change).
 - Every reference to a dependency specification matches the version configured in `sushi-config.yaml`; `dev` and `build` dependencies use the corresponding `build.fhir.org` URL.
 - The skill memory in [spec-locations.md](./references/spec-locations.md) records the verified locations used by the check, including any newly discovered or corrected mappings.
 - Local triple-bracket references resolve through the generated link-reference mechanism.
