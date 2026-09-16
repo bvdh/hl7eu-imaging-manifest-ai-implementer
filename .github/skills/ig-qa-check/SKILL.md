@@ -1,14 +1,13 @@
 ---
 name: ig-qa-check
-description: "Validate a FHIR Implementation Guide for profile-reference correctness and publisher quality. Use when checking [[[profile]]] links, direct profile references, MADO/MHD references, Jekyll aliases, rendered hyperlinks, broken links, SUSHI output, or IG QA before release."
-Run a focused quality check for a FHIR Implementation Guide, with special attention to references to profiles and other named FHIR artifacts. The check covers source content, FSH descriptions, Jekyll aliases, generated links, publisher QA output, and example coverage for local profiles and named slices.
+description: "Validate a FHIR Implementation Guide for profile references, FSH narrative-template alignment, and publisher quality. Use when checking [[[profile]]] links, FHIR Shorthand narratives, MADO/MHD references, Jekyll aliases, rendered hyperlinks, broken links, SUSHI output, or IG QA before release."
 ---
 
 # IG QA Check
 
 ## Purpose
 
-Run a focused quality check for a FHIR Implementation Guide, with special attention to references to profiles and other named FHIR artifacts. The check covers source content, FSH descriptions, Jekyll aliases, generated links, and publisher QA output.
+Run a focused quality check for a FHIR Implementation Guide, with special attention to references to profiles and other named FHIR artifacts, template-driven narratives in FSH examples, and publisher QA output. The check covers source content, FSH descriptions and narratives, Jekyll aliases, generated links, and publisher QA output.
 
 This skill is intended for the repository layout where the guide is under `imaging-manifest-fork/`. Adapt the paths if the IG root is supplied explicitly.
 
@@ -21,6 +20,8 @@ The skill's persistent memory of known specification URLs is maintained in [spec
 - Validate MADO or MHD profile references in narrative pages and FSH descriptions.
 - Check that references to specifications declared in `sushi-config.yaml` use the correct dependency version, including build URLs for `dev` and `build` dependencies.
 - Confirm that generated StructureDefinition descriptions do not retain unresolved profile tokens.
+- Check that existing resource and Composition section narratives in FSH examples align with structured resource content and the editable FHIR narrative templates.
+- Check every matcher in `input/ignoreWarnings.txt` against an unsuppressed build and remove entries for diagnostics that are no longer generated.
 - Audit example coverage for local profiles and named slices.
 - Check that every FHIR element carrying an obligation is marked Must Support.
 - Flag lower-case `may`, `should`, and `shall` in narrative prose that reads as an RFC 2119 keyword, and suggest either rewording or upper-casing.
@@ -30,6 +31,8 @@ The skill's persistent memory of known specification URLs is maintained in [spec
 
 - Treat `input/` as authoritative source.
 - Inspect `input/pagecontent/**/*.md`, `input/includes/**`, and `input/fsh/**/*.fsh`.
+- Use the `FHIR Narrative Generator` custom agent to audit FSH example instances that already contain `text.div` or `Composition.section.text.div`. Instances and sections without existing narrative are outside this check and must not be flagged as missing narrative.
+- Treat every non-empty, non-comment line after the `== Suppressed Messages ==` header in `input/ignoreWarnings.txt` as a suppression matcher. Preserve comments as justification for the following matcher or matcher group.
 - Include both triple-bracket references and direct named-artifact text.
 - Distinguish named artifacts from generic FHIR resource words. Do not automatically link generic terms such as `Patient`, `Bundle`, `DocumentReference`, or `ImagingStudy` unless the task explicitly requests it.
 - Map local StructureDefinitions to `StructureDefinition-<id>.html`, local ActorDefinitions to `ActorDefinition-<id>.html`, and local CapabilityStatements to `CapabilityStatement-<id>.html`.
@@ -141,6 +144,42 @@ Report the audit in a table:
 
 The check fails if any locally authored obligation-bearing element has `mustSupport` absent or set to `false`. Summarize the total number checked, passed, and failed. This audit is independent of example coverage: an example may exercise an element, but it cannot substitute for the profile's Must Support flag.
 
+### 1b. Check FSH narrative-template alignment
+
+Delegate this check to the `FHIR Narrative Generator` custom agent. Its template library under `.github/agents/fhir-narrative-templates/` is authoritative for the narrative layout; structured FSH rules remain authoritative for narrative values.
+
+First discover the in-scope narratives:
+
+```sh
+rg -n '^\* (text|section(?:\[[^]]+\])?\.text)\.(status|div)\s*=' input/fsh
+```
+
+Invoke the agent in **QA audit mode** with the guide root and the discovered FSH files. The delegation prompt must state:
+
+```text
+Audit existing FSH example narratives against the editable narrative templates and structured resource content. Report only: do not edit FSH or templates. Check only Instance declarations with Usage: #example that already contain text.div or Composition.section.text.div. Compare rendered XHTML semantically, ignoring indentation-only whitespace and literal \n formatting. Report template selection, stale or unsupported values, invalid XHTML, missing or ambiguous templates, and evidence for each result.
+```
+
+For every in-scope resource or section narrative, require the agent to:
+
+1. Resolve the underlying FHIR resource type from `InstanceOf`, including local profile inheritance.
+2. Select the resource template by `resourceType`, or the Composition section template by the full `system|code` identity. Use the uncoded wildcard template only for a section with no code.
+3. Build dynamic values from the structured FSH instance, referenced example instances, and inherited fixed or patterned values needed by the template.
+4. Render the selected template conceptually and compare it with the existing XHTML. Ignore differences caused only by indentation, XML-insignificant whitespace, or quoted FSH `\n` escapes.
+5. Flag narrative values that are stale, fabricated, missing from structured content, or inconsistent with explicit displays and referenced resources.
+6. Validate one XHTML `div` root, the FHIR XHTML namespace, balanced supported elements, XML escaping, and the existing `Narrative.status`.
+7. Report a missing template when narrative exists but no exact applicable template is available. In audit mode, describe the template key and proposed filename but do not create it.
+
+Report the audit in a table:
+
+| FSH file | Instance / section | Template key | Template | Structured evidence | Result | Required action |
+|---|---|---|---|---|---|---|
+| `input/fsh/examples/example.fsh` | `example-id` / resource or section path | `resource:Composition` or `section:system|code` | Template path or `Missing` | Relevant FSH paths and referenced instances | `Pass`, `Fail`, or `Needs review` | Exact narrative or template correction |
+
+Summarize the number of resource narratives and section narratives checked, passed, failed, and requiring review. A stale narrative, invalid XHTML, ambiguous template match, or missing applicable template fails this QA check.
+
+Only when the user explicitly requests fixes, invoke the same agent a second time in **update mode** for the failed rows. Allow it to update only the affected existing narratives and to create or update user-editable templates according to its own constraints. Afterward, run SUSHI and repeat the audit in report-only mode. Do not treat the update-mode report as verification.
+
 ### 2. Check spelling and grammar
 
 Review all in-scope Markdown, FSH descriptions, and newly edited link text for spelling and grammar errors. Preserve FHIR, MADO, MHD, DICOM, Xt-EHR, profile ids, URLs, code, query examples, and other domain-specific identifiers exactly as written.
@@ -214,6 +253,7 @@ Keep changes limited to the owning source files:
 - Add missing `fsh-link-references.md` imports to pages that use resolvable triple-bracket tokens.
 - Correct token names when they do not match the declared artifact id.
 - Replace unsupported triple-bracket references in FSH descriptions with explicit Markdown links to the authoritative external profile page.
+- When narrative fixes were explicitly requested, apply only the changes identified by the `FHIR Narrative Generator` audit to existing FSH narratives and their editable templates.
 - Reuse existing aliases and link templates before adding new definitions.
 - Do not hand-edit generated link-reference files or generated HTML.
 
@@ -233,6 +273,7 @@ Also run:
 cd imaging-manifest-fork
 git diff --check
 rg -n '\[\[\[' input/pagecontent input/fsh
+rg -n '^\* (text|section(?:\[[^]]+\])?\.text)\.(status|div)\s*=' input/fsh
 ```
 
 The final `rg` should return no unresolved tokens unless a specific token is intentionally retained and documented.
@@ -252,6 +293,84 @@ Confirm these files are regenerated:
 - `output/qa.json`
 - `output/qa-time-report.json`
 - `output/qa-time-report.tsv`
+
+For each FSH narrative audited in section 1b, inspect the corresponding freshly compiled example JSON. Confirm that `text.div` and `section[].text.div` contain valid XHTML and the expected current values. Formatting may differ after JSON serialization; compare semantic XHTML content rather than indentation or escaped newlines.
+
+### 6a. Check every ignored-warning entry
+
+Audit suppression liveness with two builds that use the same command, environment, publisher, terminology mode, dependency cache, and source revision. The only intentional difference between the builds must be the contents of `input/ignoreWarnings.txt`.
+
+1. Parse and inventory every suppression matcher before changing the file. Record its line number, preceding justification comment block, and whether it uses `%` wildcards. Do not treat the header, blank lines, or `#` comments as matchers.
+2. Use the fresh normal build from section 6 as the suppressed baseline only when its console log and QA artifacts were captured and the exact command can be repeated. Otherwise, rerun the normal build as the first side of the pair. Preserve its console log, `output/qa.json`, and `output/qa.html` before running the unsuppressed build.
+3. Save an exact-byte backup of the current `input/ignoreWarnings.txt`, including any pre-existing user changes. Install an exit/signal trap that restores that backup before emptying the file.
+4. Replace `input/ignoreWarnings.txt` temporarily with an empty file and run the same build command used for the baseline. Capture the exit status and preserve the unsuppressed console log, `output/qa.json`, and `output/qa.html` in a temporary audit directory.
+5. Restore the exact original file immediately after the unsuppressed build, before analyzing or editing suppressions. Verify restoration with `cmp`. If the build is interrupted or restoration cannot be verified, stop without removing entries.
+
+One safe shell pattern, run from the guide root, is:
+
+```sh
+set -o pipefail
+audit_dir="$(mktemp -d)"
+cp input/ignoreWarnings.txt "$audit_dir/ignoreWarnings.original.txt"
+
+restore_ignore_warnings() {
+	cp "$audit_dir/ignoreWarnings.original.txt" input/ignoreWarnings.txt
+}
+trap restore_ignore_warnings EXIT HUP INT TERM
+
+./_build.sh build 2>&1 | tee "$audit_dir/build.suppressed.log"
+suppressed_status=${PIPESTATUS[0]}
+if [[ "$suppressed_status" -ne 0 ]]; then
+	restore_ignore_warnings
+	trap - EXIT HUP INT TERM
+	exit "$suppressed_status"
+fi
+cp output/qa.json "$audit_dir/qa.suppressed.json"
+cp output/qa.html "$audit_dir/qa.suppressed.html"
+
+: > input/ignoreWarnings.txt
+./_build.sh build 2>&1 | tee "$audit_dir/build.unsuppressed.log"
+unsuppressed_status=${PIPESTATUS[0]}
+cp output/qa.json "$audit_dir/qa.unsuppressed.json"
+cp output/qa.html "$audit_dir/qa.unsuppressed.html"
+
+restore_ignore_warnings
+trap - EXIT HUP INT TERM
+cmp -s "$audit_dir/ignoreWarnings.original.txt" input/ignoreWarnings.txt
+test "$unsuppressed_status" -eq 0
+```
+
+Adapt `./_build.sh build` to the selected supported build mode when necessary, but use that exact mode for both runs. Do not use `nosushi` for only one side of the comparison. Keep the audit directory until the QA report is complete.
+
+Extract individual diagnostics from both build logs and `qa.html` files, decoding HTML entities and removing presentation markup without changing diagnostic text. Use `qa.json` for count corroboration, not as the sole message source because it contains summary counts rather than every diagnostic.
+
+Match each suppression entry using publisher-style `%` wildcards:
+
+- An entry without `%` requires equality with a normalized diagnostic message, excluding severity, location, and presentation prefixes.
+- For an entry containing `%`, split on `%`; all non-empty literal fragments must occur in order within one normalized diagnostic. A leading or trailing `%` permits text before or after the corresponding fragment.
+- Do not use fuzzy spelling, case folding, or cross-diagnostic fragment matching.
+- Count matching diagnostic occurrences in both suppressed and unsuppressed evidence.
+
+Classify every entry:
+
+- `Active`: the matcher finds at least one diagnostic in the unsuppressed build and exposes more occurrences than in the suppressed baseline.
+- `Stale`: the matcher finds no diagnostic in the complete unsuppressed build.
+- `Ineffective`: matching diagnostics occur, but the unsuppressed build exposes no additional occurrences; retain the entry and report that its syntax or scope needs review.
+- `Overbroad`: the matcher suppresses multiple materially different diagnostic messages; retain it and report the distinct matches for review.
+- `Indeterminate`: either build did not reach complete QA output, evidence extraction failed, or environmental differences make the comparison unreliable; retain the entry and state why.
+
+Remove every entry classified `Stale` from `input/ignoreWarnings.txt`. Remove its justification comments only when all matchers governed by that comment block are stale; preserve shared comments for any retained matcher. Do not remove `Active`, `Ineffective`, `Overbroad`, or `Indeterminate` entries automatically.
+
+After editing, run the normal build again with the reduced suppression file. Confirm the build succeeds, no removed matcher is needed, and `output/qa.json` reflects the normal suppressed state. If the final build regenerates a removed diagnostic, restore that matcher and classify it `Indeterminate` with the observed instability.
+
+Report every matcher, including retained entries:
+
+| Line | Suppression matcher | Justification | Suppressed count | Unsuppressed count | Status | Action |
+|---|---|---|---:|---:|---|---|
+| 12 | `%example warning%` | Dependency limitation | 0 | 3 | `Active` | Retained |
+| 18 | `Old warning text` | Historical publisher issue | 0 | 0 | `Stale` | Removed with orphaned comment |
+
+Summarize total entries checked and counts by status, entries removed, comments removed, build commands used, audit evidence directory, and the final normal-build QA counts.
 
 ### 7. Validate rendered profile links
 
@@ -299,6 +418,8 @@ Include rows for every applicable procedure section, at minimum:
 - Jekyll alias and rendered-token checks.
 - Work-note include discovery and per-note validity checks.
 - Obligation-to-Must-Support consistency checks.
+- FSH resource and Composition section narrative-template alignment using the `FHIR Narrative Generator` agent.
+- Per-entry `ignoreWarnings.txt` liveness audit using suppressed and unsuppressed builds.
 - Lower-case `may`/`should`/`shall` normative-language review.
 - Profile and named-slice example coverage checks.
 - Spelling and grammar review.
@@ -324,6 +445,12 @@ The check is complete when:
 - The final report lists every applicable check performed, including scope, evidence, and result.
 - The final report lists every issue found, ordered by severity, including file/artifact, evidence, and disposition; skipped checks are reported with reasons.
 - Every locally authored obligation-bearing FHIR element has been checked in the generated snapshot and is marked `mustSupport: true`, or any dependency-only exception is reported explicitly.
+- Every existing narrative in an in-scope FSH example has been audited by the `FHIR Narrative Generator` against structured resource content and the applicable editable template; uncoded and coded Composition sections use the correct template-selection rule.
+- Narrative audit results identify the template key and evidence for every checked resource or section, and any missing or ambiguous template, stale value, invalid XHTML, or unsupported literal is reported.
+- Freshly compiled example JSON has been inspected for every audited narrative after any narrative or template fix.
+- Every non-comment matcher in `input/ignoreWarnings.txt` has a reported liveness classification based on a complete unsuppressed build made under the same conditions as the suppressed baseline.
+- Every matcher proven `Stale` has been removed with only its orphaned justification comments, while uncertain, active, ineffective, and overbroad entries are retained and reported.
+- The original warning file was restored byte-for-byte after the temporary unsuppressed build, and the reduced suppression file was validated by a final normal build.
 - Every lower-case `may`, `should`, or `shall` found in narrative prose has been classified as a normative requirement or descriptive text, with a proposed capitalization or rewording reported in a table (page, line, paragraph, proposed change).
 - Every reference to a dependency specification matches the version configured in `sushi-config.yaml`; `dev` and `build` dependencies use the corresponding `build.fhir.org` URL.
 - The skill memory in [spec-locations.md](./references/spec-locations.md) records the verified locations used by the check, including any newly discovered or corrected mappings.
@@ -340,6 +467,13 @@ The check is complete when:
 - **False source-check pass:** the checker assumes a root `input/pagecontent/` directory, but the guide is nested. Run it from the correct root or adapt the command.
 - **Literal triple-bracket text:** the page does not import `fsh-link-references.md`, the token spelling is wrong, or the token is used in a serialized FSH description rather than a Jekyll page.
 - **Stale generated include:** rebuild with SUSHI before judging generated link-reference contents.
+- **Narrative audit mutates source:** the agent was invoked without the required QA audit-mode instruction. Revert only changes made by that invocation, preserve pre-existing worktree changes, and rerun with `Report only: do not edit FSH or templates`.
+- **False narrative mismatch:** template indentation, XML-insignificant whitespace, or quoted FSH `\n` escapes were compared literally. Compare semantic XHTML and structured values instead.
+- **Wrong section template:** an uncoded wildcard template was applied to a coded Composition section, or only the code was compared. Match coded sections by the full `system|code` pair.
+- **Lost warning-file changes:** the unsuppressed build emptied a modified `ignoreWarnings.txt` without an exact backup and restoration trap. Stop the audit and recover the saved working copy; never restore from `HEAD` over user changes.
+- **False stale suppression:** the unsuppressed build failed early, used another terminology/build mode, or diagnostics were read only from summary counts. Classify entries as `Indeterminate` until a complete paired build provides message-level evidence.
+- **Wildcard mismatch:** `%` was treated as a literal character or as unconstrained fuzzy matching. Match ordered literal fragments within one normalized diagnostic.
+- **Orphaned justification:** a stale matcher was removed but its now-unused comment block remained, or a shared comment was removed while active matchers still depend on it. Review comments as matcher-group metadata.
 - **Wrong actor link:** compare the token with the exact `Instance:` id and generated `ActorDefinition-*.html` filename.
 - **Broken dependency link:** verify the dependency's canonical URL and version before changing the IG dependency declaration.
 - **Unrelated QA noise:** compare against the pre-change QA artifact and avoid fixing unrelated publisher warnings.

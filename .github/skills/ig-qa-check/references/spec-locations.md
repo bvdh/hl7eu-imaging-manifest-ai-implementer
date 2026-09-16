@@ -4,10 +4,10 @@ This file is the persistent location memory for the `ig-qa-check` skill. It reco
 
 | Package or specification | Version observed | Build or current location | Release or versioned location | Verification status |
 |---|---:|---|---|---|
-| IHE RAD MADO (`ihe.rad.mado`) | `dev` | https://build.fhir.org/ig/IHE/RAD.MADO/ | None recorded; use the build location for `dev` | Verify during each QA run |
-| IHE ITI MHD (`ihe.iti.mhd`) | `4.2.3` | https://profiles.ihe.net/ITI/MHD/ | Release-specific path not recorded | Verify against the dependency release metadata |
+| IHE RAD MADO (`ihe.rad.mado`) | `1.0.0` | Not applicable for the pinned release | None recorded | Version confirmed from `imaging-manifest-fork/sushi-config.yaml`; release URL still requires verification |
+| IHE ITI MHD (`ihe.iti.mhd`) | `4.2.3` | https://profiles.ihe.net/ITI/MHD/ | Release-specific path not recorded | Pinned intentionally; `5.0.0` freshness warning is deferred pending compatibility review |
 | HL7 EU Base (`hl7.fhir.eu.base`) | `2.0.0` | https://build.fhir.org/ig/hl7-eu/base-r5/ | Version-specific path not recorded | Verify against the package version and FHIR release |
-| HL7 Europe Extensions R4 (`hl7.fhir.eu.extensions.r4`) | `1.3.0` | https://build.fhir.org/ig/hl7-eu/extensions-r4/ | Canonical ImplementationGuide: http://hl7.eu/fhir/extensions/ImplementationGuide/hl7.fhir.eu.extensions | Verify against the R4 package metadata |
+| HL7 Europe Extensions R4 (`hl7.fhir.eu.extensions.r4`) | `1.3.1` | https://build.fhir.org/ig/hl7-eu/extensions-r4/ | Canonical ImplementationGuide: http://hl7.eu/fhir/extensions/ImplementationGuide/hl7.fhir.eu.extensions | Version confirmed by `sushi-config.yaml` and the final build package load |
 | FHIR cross-version extensions R5-to-R4 (`hl7.fhir.uv.xver-r5.r4`) | `0.1.0` | https://hl7.org/fhir/uv/xver-r5.r4/0.1.0/ | Same versioned location | Verify against the package metadata |
 | Xt-EHR common / imaging | External | https://build.fhir.org/ig/Xt-EHR/xt-ehr-common/en/ | Versioned links may occur in mapping pages | Verify the version in each source link |
 | HL7 Europe Imaging Report | External | https://build.fhir.org/ig/hl7-eu/imaging-r4/ | Versioned release not recorded | Verify the intended release before publication |

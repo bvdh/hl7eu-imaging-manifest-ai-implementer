@@ -1,0 +1,42 @@
+---
+kind: composition-section
+system: "*"
+code: "*"
+---
+<div xmlns="http://www.w3.org/1999/xhtml" lang="{{ composition.language }}" xml:lang="{{ composition.language }}">
+	<table>
+		<tbody>
+			{% if series.uid %}
+			<tr><td><b>Series Id</b></td><td>{{ series.uid }}</td></tr>
+			{% endif %}
+			{% if series.modality %}
+			<tr><td><b>Modality</b></td><td>{{ series.modality }}</td></tr>
+			{% endif %}
+			{% if series.bodySite %}
+			<tr><td><b>Bodysite</b></td><td>{{ series.bodySite }}</td></tr>
+			{% endif %}
+			{% if series.started %}
+			<tr><td><b>Started</b></td><td>{{ series.started }}</td></tr>
+			{% endif %}
+			{% if series.description %}
+			<tr><td><b>Description</b></td><td>{{ series.description }}</td></tr>
+			{% endif %}
+			{% if series.numberOfInstances %}
+			<tr><td><b>Number of Instances</b></td><td>{{ series.numberOfInstances }}</td></tr>
+			{% endif %}
+			{% for endpoint in series.endpoints %}
+			<tr><td><b>Endpoint</b></td><td>{{ endpoint.display }}: {{ endpoint.address }}</td></tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% if series.instances %}
+	<p>Instances:</p>
+	<ul>
+		{% for instance in series.instances %}
+		<li>
+			{{ instance.title }} &#8212; {{ instance.sopClass.display }} &#8212; SOP Instance UID {{ instance.uid }}{% if instance.number %} (instance {{ instance.number }}){% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+</div>

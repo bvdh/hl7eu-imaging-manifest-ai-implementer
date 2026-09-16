@@ -1,0 +1,50 @@
+---
+kind: resource
+resourceType: Composition
+---
+<div xmlns="http://www.w3.org/1999/xhtml" lang="{{ language }}" xml:lang="{{ language }}">
+	<h1>{{ title }}</h1>
+	<table>
+		<tbody>
+			{% if studyInstanceUid %}
+			<tr><td><b>Study Instance UID</b></td><td>{{ studyInstanceUid | remove: 'urn:oid:' }}</td></tr>
+			{% endif %}
+			{% if subject.display %}
+			<tr><td><b>Subject</b></td><td>{{ subject.display }}</td></tr>
+			{% endif %}
+			{% for author in authors %}
+			<tr><td><b>Author</b></td><td>{{ author.display }}</td></tr>
+			{% endfor %}
+			{% if date %}
+			<tr><td><b>Created</b></td><td>{{ date }}</td></tr>
+			{% endif %}
+			{% if type.display %}
+			<tr><td><b>Type</b></td><td>{{ type.display }}</td></tr>
+			{% endif %}
+			{% if category.display %}
+			<tr><td><b>Category</b></td><td>{{ category.display }}</td></tr>
+			{% endif %}
+			{% if imagingStudy.started %}
+			<tr><td><b>Study Start</b></td><td>{{ imagingStudy.started }}</td></tr>
+			{% endif %}
+			{% if imagingStudy.modalities %}
+			<tr><td><b>Modalities</b></td><td>{{ imagingStudy.modalities }}</td></tr>
+			{% endif %}
+			{% if imagingStudy.anatomicalRegion %}
+			<tr><td><b>Anatomical region</b></td><td>{{ imagingStudy.anatomicalRegion }}</td></tr>
+			{% endif %}
+			{% if serviceRequest.accessionNumber %}
+			<tr><td><b>Accession number</b></td><td>{{ serviceRequest.accessionNumber }}</td></tr>
+			{% endif %}
+			{% if imagingStudy.procedure %}
+			<tr><td><b>Procedure</b></td><td>{{ imagingStudy.procedure }}</td></tr>
+			{% endif %}
+			{% if imagingStudy.numberOfSeries %}
+			<tr><td><b>Number of series</b></td><td>{{ imagingStudy.numberOfSeries }}</td></tr>
+			{% endif %}
+			{% if imagingStudy.numberOfInstances %}
+			<tr><td><b>Number of instances</b></td><td>{{ imagingStudy.numberOfInstances }}</td></tr>
+			{% endif %}
+		</tbody>
+	</table>
+</div>
